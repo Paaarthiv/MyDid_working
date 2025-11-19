@@ -1,0 +1,112 @@
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Shield, FileText, Building2 } from "lucide-react";
+import AnimatedPage from "./shared/AnimatedPage";
+import { useAuth } from "../context/AuthContext";
+
+function IssuerDashboard() {
+  const navigate = useNavigate();
+  const { userRole } = useAuth();
+
+  // Ensure only issuer can access
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    if (role !== "issuer" || userRole !== "issuer") {
+      navigate("/");
+    }
+  }, [userRole, navigate]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  return (
+    <AnimatedPage className="min-h-screen py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Back to Home Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-6 flex justify-end"
+        >
+          <button
+            onClick={() => {
+              if (window.confirm("Return to portal selection? You will be logged out.")) {
+                localStorage.clear();
+                navigate("/");
+              }
+            }}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
+          >
+            ← Back to Home
+          </button>
+        </motion.div>
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl shadow-lg shadow-blue-500/50 mb-4">
+            <Building2 className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.5)]">
+            Issuer Dashboard
+          </h1>
+          <p className="text-slate-400 text-lg">Issue and manage verifiable credentials</p>
+        </motion.div>
+
+        {/* Action Buttons */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <motion.button
+            variants={itemVariants}
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/issuer/requests")}
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-cyan-500/10 hover:border-blue-500/30 transition-all duration-300 group"
+          >
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all">
+              <FileText className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Handle Credential Requests</h3>
+            <p className="text-slate-400 text-sm">Review and approve credential requests from holders</p>
+          </motion.button>
+
+          <motion.button
+            variants={itemVariants}
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/issuer/view-issued")}
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-cyan-500/10 hover:border-blue-500/30 transition-all duration-300 group"
+          >
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">View Issued Credentials</h3>
+            <p className="text-slate-400 text-sm">Manage and track all issued verifiable credentials</p>
+          </motion.button>
+        </motion.div>
+      </div>
+    </AnimatedPage>
+  );
+}
+
+export default IssuerDashboard;
