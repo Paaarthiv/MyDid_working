@@ -12,9 +12,9 @@ function RoleSelection() {
       title: "Issuer Portal",
       icon: Building2,
       description: "Issue and manage verifiable credentials",
-      color: "from-blue-500 to-cyan-600",
-      hoverColor: "hover:from-blue-600 hover:to-cyan-700",
-      bgGlow: "bg-blue-500/20",
+      color: "from-[#141E30] to-[#35577D]",
+      hoverColor: "hover:from-[#0F1922] hover:to-[#2E4A6B]",
+      bgGlow: "bg-[#35577D]/20",
       route: "/issuer-login",
       features: ["Create VCs", "Manage Credentials", "BBS+ Signatures"]
     },
@@ -23,9 +23,9 @@ function RoleSelection() {
       title: "Holder Portal",
       icon: User,
       description: "Store and share your credentials securely",
-      color: "from-green-500 to-emerald-600",
-      hoverColor: "hover:from-green-600 hover:to-emerald-700",
-      bgGlow: "bg-green-500/20",
+      color: "from-[#2D1E2F] to-[#4E2A4F]",
+      hoverColor: "hover:from-[#231823] hover:to-[#3E2240]",
+      bgGlow: "bg-[#4E2A4F]/20",
       route: "/holder-login",
       features: ["View VCs", "Selective Disclosure", "Share Proofs"]
     },
@@ -34,9 +34,9 @@ function RoleSelection() {
       title: "Verifier Portal",
       icon: Search,
       description: "Verify credential authenticity",
-      color: "from-purple-500 to-violet-600",
-      hoverColor: "hover:from-purple-600 hover:to-violet-700",
-      bgGlow: "bg-purple-500/20",
+      color: "from-[#0F2027] to-[#28623A]",
+      hoverColor: "hover:from-[#0A1419] hover:to-[#1F5030]",
+      bgGlow: "bg-[#28623A]/20",
       route: "/verifier-login",
       features: ["Scan QR Codes", "Verify Signatures", "Check Blockchain"]
     }
@@ -54,8 +54,8 @@ function RoleSelection() {
 
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
@@ -111,7 +111,7 @@ function RoleSelection() {
           </motion.div>
 
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-indigo-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(99,102,241,0.5)]">
-            Welcome to DigiLocker
+            DID Vault
           </h1>
           <p className="text-slate-400 text-xl mb-2">Decentralized Digital Identity Management</p>
           <p className="text-slate-500 text-lg">Choose your portal to continue</p>
@@ -138,7 +138,7 @@ function RoleSelection() {
                 <div className="relative h-full bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 overflow-hidden transition-all duration-300 hover:border-slate-600/50 hover:shadow-2xl">
                   {/* Glow Effect */}
                   <div className={`absolute inset-0 ${role.bgGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl`} />
-                  
+
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon */}

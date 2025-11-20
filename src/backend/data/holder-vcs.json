@@ -1,21 +1,6 @@
 {
   "0x480b1b5ff78734158711d489ad3ad312379118f3": [
     {
-      "vcCID": "QmdrDKjkjWDmuVSsSZCy8gvQrJeg6K9dt8KV8ZZ7XxD25x",
-      "issuerDID": "did:ethr:0x480b1B5Ff78734158711D489aD3aD312379118f3",
-      "issuanceDate": "2025-11-04T14:13:15.322Z",
-      "credentialType": "StudentID",
-      "credentialSubject": {
-        "name": "Sebu",
-        "rollNumber": "20",
-        "department": "CSE",
-        "dateOfBirth": "2003-01-01",
-        "documentType": "Student ID",
-        "documentHash": "f61b37906bada0dd9667802572cdd63e2beabd05fe955b488db9b0eeb715654c"
-      },
-      "receivedAt": "2025-11-04T14:13:19.504Z"
-    },
-    {
       "vcCID": "QmfFR5RkDadsRz5zcFApuKXWSZ5aPowFb73WhbeY75Hcsh",
       "issuerDID": "did:ethr:0x480b1B5Ff78734158711D489aD3aD312379118f3",
       "issuanceDate": "2025-11-04T14:55:52.477Z",

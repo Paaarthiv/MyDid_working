@@ -1,704 +1,100 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import QRUploadZone from "./wallet/QRUploadZone";
-import WalletCard from "./wallet/WalletCard";
-import CardDetailsDrawer from "./wallet/CardDetailsDrawer";
-import { saveVerifierHistory } from "../utils/walletStorage";
-import "../styles/walletTheme.css";
+import { motion } from "framer-motion";
+import { Search, User, Shield } from "lucide-react";
+import AnimatedPage from "./shared/AnimatedPage";
 
 export default function VerifierDashboard() {
   const navigate = useNavigate();
-  const [cid, setCid] = useState("");
-  const [publicKey, setPublicKey] = useState("");
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [saveToHistory, setSaveToHistory] = useState(true);
-  const [showDrawer, setShowDrawer] = useState(false);
-  const [qrError, setQrError] = useState(null);
 
-  const handleQRSuccess = (data) => {
-    console.log("✅ QR decoded:", data);
-    setCid(data.cid);
-    if (data.publicKey) {
-      setPublicKey(data.publicKey);
-    }
-    setQrError(null);
-    
-    // Auto-verify if CID is valid
-    if (data.cid && data.cid.length > 10) {
-      setTimeout(() => verify(data.cid, data.publicKey), 500);
-    }
-  };
-
-  const handleQRError = (error) => {
-    console.error("❌ QR decode error:", error);
-    setQrError(error);
-  };
-
-  const verify = async (providedCid = null, providedKey = null) => {
-    const cidToVerify = providedCid || cid.trim();
-    const keyToVerify = providedKey || publicKey.trim();
-
-    if (!cidToVerify) {
-      alert("Please enter or upload a QR code with an IPFS CID");
-      return;
-    }
-
-    setLoading(true);
-    setResult(null);
-    setQrError(null);
-
-    try {
-      console.log("🔍 Sending verification request:", { 
-        cid: cidToVerify, 
-        publicKey: keyToVerify || 'none' 
-      });
-      
-      const response = await axios.post("http://localhost:5000/verifyVC", {
-        cid: cidToVerify,
-        publicKey: keyToVerify || undefined
-      });
-
-      setResult(response.data);
-      console.log("✅ Verification result:", response.data);
-      console.log("🔍 Is Presentation?", response.data.isPresentation);
-      console.log("📋 Disclosed Data:", response.data.disclosedData);
-
-      // Save to history if enabled
-      if (saveToHistory && response.data.verified) {
-        const userAddress = localStorage.getItem("userAddress") || "anonymous";
-        
-        // Get VC type from either vc or vcType field
-        let vcType = 'VerifiableCredential';
-        if (response.data.vcType && Array.isArray(response.data.vcType)) {
-          vcType = response.data.vcType[1] || response.data.vcType[0];
-        } else if (response.data.vc?.type) {
-          vcType = response.data.vc.type[1] || response.data.vc.type[0];
-        }
-        
-        saveVerifierHistory({
-          cid: cidToVerify,
-          issuerDid: response.data.issuer || response.data.details?.issuer || 'N/A',
-          subjectDid: response.data.details?.subject || 'N/A',
-          vcType: vcType,
-          result: response.data.verified ? 'verified' : 'failed',
-          chainHashMatch: response.data.hashMatch || false
-        }, userAddress);
-        console.log("💾 Saved to verification history");
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
       }
-
-    } catch (error) {
-      console.error("❌ Verification error:", error);
-      
-      const errorMessage = error.response?.data?.message 
-        || error.response?.data?.error 
-        || error.message 
-        || "Verification failed";
-
-      setResult({
-        success: false,
-        verified: false,
-        error: errorMessage,
-        details: {}
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleReset = () => {
-    setCid("");
-    setPublicKey("");
-    setResult(null);
-    setQrError(null);
-  };
-
-  const getStatusIcon = (value) => {
-    if (value === true) return "✅";
-    if (value === false) return "❌";
-    return "⚠️";
-  };
-
-  const getStatusColor = (value) => {
-    if (value === true) return "var(--color-success)";
-    if (value === false) return "var(--color-error)";
-    return "var(--color-warning)";
-  };
-
-  const truncate = (str, length = 40) => {
-    if (!str) return 'N/A';
-    return str.length > length ? str.substring(0, length) + '...' : str;
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'var(--color-background)',
-      paddingBottom: '40px'
-    }}>
-      {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #9333EA 0%, #A855F7 100%)',
-        padding: '32px 24px',
-        color: 'white',
-        boxShadow: 'var(--shadow-md)'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h1 style={{ 
-                fontSize: 'var(--font-size-3xl)', 
-                fontWeight: '600', 
-                margin: '0 0 8px 0',
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}>
-                🔍 Verify Credential
-              </h1>
-              <p style={{ 
-                fontSize: 'var(--font-size-base)', 
-                margin: 0,
-                opacity: 0.9
-              }}>
-                Upload QR code or enter CID to verify a credential
-              </p>
-            </div>
-            <button
-              onClick={() => navigate("/verifier/history")}
-              style={{
-                padding: '12px 24px',
-                background: 'rgba(255,255,255,0.2)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: 'var(--radius-md)',
-                color: 'white',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all var(--transition-fast)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
-              onMouseOut={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
-            >
-              📜 View History
-            </button>
+    <AnimatedPage className="min-h-screen p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-6 flex justify-end"
+        >
+          <button
+            onClick={() => {
+              if (window.confirm("Return to portal selection? You will be logged out.")) {
+                localStorage.clear();
+                navigate("/");
+              }
+            }}
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
+          >
+            ← Back to Home
+          </button>
+        </motion.div>
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#0F2027] to-[#28623A] rounded-2xl shadow-lg shadow-emerald-500/50 mb-4">
+            <Search className="w-8 h-8 text-white" />
           </div>
-        </div>
+          <h1 className="text-5xl font-extrabold mb-4 pb-2 bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(16,185,129,0.5)]">
+            Verifier Dashboard
+          </h1>
+          <p className="text-slate-400 text-lg">Verify and validate credentials</p>
+        </motion.div>
+
+        {/* Action Buttons */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <motion.button
+            variants={itemVariants}
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/verifier")}
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-emerald-500/10 hover:to-green-500/10 hover:border-emerald-500/30 transition-all duration-300 group"
+          >
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#0F2027] to-[#28623A] rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-500/50 transition-all">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Verify Credential</h3>
+            <p className="text-slate-400 text-sm">Scan QR code or enter CID to verify credentials</p>
+          </motion.button>
+
+          <motion.button
+            variants={itemVariants}
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/verifier/profile")}
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-emerald-500/10 hover:to-green-500/10 hover:border-emerald-500/30 transition-all duration-300 group"
+          >
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#0F2027] to-[#28623A] rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-500/50 transition-all">
+              <User className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">View Profile</h3>
+            <p className="text-slate-400 text-sm">View your wallet address, DID, and public key</p>
+          </motion.button>
+        </motion.div>
       </div>
-
-      {/* Content */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-          
-          {/* Left Column - Input */}
-          <div>
-            {/* QR Upload */}
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ 
-                fontSize: 'var(--font-size-lg)',
-                fontWeight: '600',
-                marginBottom: '16px',
-                color: 'var(--color-text-primary)'
-              }}>
-                📷 Upload QR Code
-              </h3>
-              <QRUploadZone 
-                onSuccess={handleQRSuccess}
-                onError={handleQRError}
-              />
-              {qrError && (
-                <div style={{
-                  marginTop: '12px',
-                  padding: '12px',
-                  background: 'rgba(245, 54, 92, 0.1)',
-                  border: '1px solid var(--color-error)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--color-error)',
-                  fontSize: 'var(--font-size-sm)'
-                }}>
-                  ❌ {qrError}
-                </div>
-              )}
-            </div>
-
-            {/* Manual Input */}
-            <div style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: 'var(--radius-md)',
-              boxShadow: 'var(--shadow-md)'
-            }}>
-              <h3 style={{ 
-                fontSize: 'var(--font-size-lg)',
-                fontWeight: '600',
-                marginBottom: '16px',
-                color: 'var(--color-text-primary)'
-              }}>
-                ✍️ Or Enter Manually
-              </h3>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: 'var(--font-size-sm)',
-                  fontWeight: '600',
-                  color: 'var(--color-text-secondary)',
-                  marginBottom: '8px'
-                }}>
-                  IPFS CID *
-                </label>
-                <input
-                  type="text"
-                  value={cid}
-                  onChange={(e) => setCid(e.target.value)}
-                  placeholder="QmXyz..."
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontFamily: 'monospace',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--color-student-id-start)'}
-                  onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
-                />
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: 'var(--font-size-sm)',
-                  fontWeight: '600',
-                  color: 'var(--color-text-secondary)',
-                  marginBottom: '8px'
-                }}>
-                  BBS+ Public Key (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={publicKey}
-                  onChange={(e) => setPublicKey(e.target.value)}
-                  placeholder="Base64 encoded public key..."
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-sm)',
-                    fontFamily: 'monospace',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--color-student-id-start)'}
-                  onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
-                />
-              </div>
-
-              {/* Save to History Toggle */}
-              <label style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '20px',
-                cursor: 'pointer',
-                fontSize: 'var(--font-size-sm)',
-                color: 'var(--color-text-secondary)'
-              }}>
-                <input
-                  type="checkbox"
-                  checked={saveToHistory}
-                  onChange={(e) => setSaveToHistory(e.target.checked)}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
-                <span>Save successful verifications to history</span>
-              </label>
-
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={() => verify()}
-                  disabled={loading || !cid.trim()}
-                  style={{
-                    flex: 1,
-                    padding: '14px',
-                    background: loading || !cid.trim() 
-                      ? 'var(--color-border)' 
-                      : 'linear-gradient(135deg, #9333EA 0%, #A855F7 100%)',
-                    border: 'none',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'white',
-                    fontSize: 'var(--font-size-base)',
-                    fontWeight: '600',
-                    cursor: loading || !cid.trim() ? 'not-allowed' : 'pointer',
-                    transition: 'all var(--transition-fast)',
-                    boxShadow: 'var(--shadow-sm)'
-                  }}
-                  onMouseOver={(e) => {
-                    if (!loading && cid.trim()) {
-                      e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.boxShadow = 'var(--shadow-md)';
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'var(--shadow-sm)';
-                  }}
-                >
-                  {loading ? '🔄 Verifying...' : '✓ Verify Credential'}
-                </button>
-                <button
-                  onClick={handleReset}
-                  style={{
-                    padding: '14px 20px',
-                    background: 'transparent',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'var(--color-text-secondary)',
-                    fontSize: 'var(--font-size-base)',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.background = 'rgba(0,0,0,0.02)';
-                    e.target.style.color = 'var(--color-text-primary)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.background = 'transparent';
-                    e.target.style.color = 'var(--color-text-secondary)';
-                  }}
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Result */}
-          <div>
-            {result ? (
-              <WalletCard
-                type="Verification"
-                title="Credential Verification"
-                subtitle={result.verified ? "Verification Successful" : "Verification Failed"}
-                headerBadge={result.verified ? "Verified" : "Failed"}
-                icon={result.verified ? "✓" : "✕"}
-                meta={[
-                  { label: 'Structure Valid', value: getStatusIcon(result.structureValid) },
-                  { label: 'IPFS Valid', value: getStatusIcon(result.ipfsValid) },
-                  { label: 'Blockchain Valid', value: getStatusIcon(result.blockchainValid) },
-                  { label: 'Hash Match', value: getStatusIcon(result.hashMatch) },
-                  { label: 'Revoked', value: result.revoked ? '❌ Yes' : '✅ No' },
-                  { label: 'Issuer', value: truncate(result.details?.issuer, 30) },
-                  { label: 'Subject', value: truncate(result.details?.subject, 30) }
-                ]}
-                actions={[
-                  {
-                    label: 'View Details',
-                    onClick: () => setShowDrawer(true),
-                    variant: 'primary',
-                    icon: '👁️'
-                  },
-                  {
-                    label: 'Verify Another',
-                    onClick: handleReset,
-                    variant: 'ghost',
-                    icon: '🔄'
-                  }
-                ]}
-                onExpand={() => setShowDrawer(true)}
-              />
-            ) : (
-              <div style={{
-                background: 'white',
-                padding: '48px 24px',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: 'var(--shadow-md)',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '64px', marginBottom: '16px' }}>🔍</div>
-                <h3 style={{
-                  fontSize: 'var(--font-size-xl)',
-                  fontWeight: '600',
-                  color: 'var(--color-text-primary)',
-                  marginBottom: '8px'
-                }}>
-                  Ready to Verify
-                </h3>
-                <p style={{
-                  fontSize: 'var(--font-size-base)',
-                  color: 'var(--color-text-secondary)',
-                  maxWidth: '300px',
-                  margin: '0 auto'
-                }}>
-                  Upload a QR code or enter a CID to verify a credential
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Details Drawer */}
-      <CardDetailsDrawer
-        isOpen={showDrawer}
-        onClose={() => setShowDrawer(false)}
-        title="Verification Details"
-      >
-        {result && (
-          <div style={{ fontSize: 'var(--font-size-sm)' }}>
-            {/* Overall Status */}
-            <div style={{
-              padding: '20px',
-              background: result.verified 
-                ? 'rgba(45, 206, 137, 0.1)' 
-                : 'rgba(245, 54, 92, 0.1)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: '24px',
-              border: `2px solid ${result.verified ? 'var(--color-success)' : 'var(--color-error)'}`
-            }}>
-              <div style={{
-                fontSize: 'var(--font-size-2xl)',
-                fontWeight: '600',
-                color: result.verified ? 'var(--color-success)' : 'var(--color-error)',
-                marginBottom: '8px'
-              }}>
-                {result.verified ? '✅ Credential Verified' : '❌ Verification Failed'}
-              </div>
-              {result.error && (
-                <div style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)' }}>
-                  {result.error}
-                </div>
-              )}
-            </div>
-
-            {/* Credential Data Section - MOVED TO TOP */}
-            <h4 style={{ 
-              fontSize: 'var(--font-size-lg)',
-              fontWeight: '700',
-              marginBottom: '12px',
-              color: 'var(--color-text-primary)'
-            }}>
-              {result.isPresentation ? '🔒 Disclosed Credential Data' : '📄 Credential Data'}
-            </h4>
-            
-            <div style={{
-              background: result.isPresentation ? 'rgba(94, 114, 228, 0.05)' : 'rgba(45, 206, 137, 0.05)',
-              padding: '16px',
-              borderRadius: 'var(--radius-md)',
-              border: `2px solid ${result.isPresentation ? 'rgba(94, 114, 228, 0.2)' : 'rgba(45, 206, 137, 0.2)'}`,
-              marginBottom: '24px'
-            }}>
-              {result.isPresentation && (
-                <p style={{
-                  fontSize: 'var(--font-size-xs)',
-                  color: 'var(--color-text-secondary)',
-                  marginBottom: '12px',
-                  fontStyle: 'italic',
-                  padding: '8px',
-                  background: 'rgba(94, 114, 228, 0.1)',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid rgba(94, 114, 228, 0.3)'
-                }}>
-                  🔐 <strong>Privacy Protected:</strong> Only the fields below were disclosed by the holder. Other credential data remains private and encrypted.
-                </p>
-              )}
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {(() => {
-                  // Determine which data to display
-                  let dataToDisplay = null;
-                  let dataSource = '';
-                  
-                  // Priority 1: Disclosed data from VP
-                  if (result.disclosedData && Object.keys(result.disclosedData).length > 0) {
-                    dataToDisplay = result.disclosedData;
-                    dataSource = 'VP disclosed data';
-                  } 
-                  // Priority 2: VC credential subject
-                  else if (result.vc?.credentialSubject) {
-                    dataToDisplay = result.vc.credentialSubject;
-                    dataSource = 'VC credential subject';
-                  }
-                  
-                  console.log('🔍 Credential Data Display:', {
-                    isPresentation: result.isPresentation,
-                    hasDisclosedData: !!result.disclosedData,
-                    disclosedDataKeys: result.disclosedData ? Object.keys(result.disclosedData) : [],
-                    hasVC: !!result.vc,
-                    hasCredentialSubject: !!result.vc?.credentialSubject,
-                    credentialSubjectKeys: result.vc?.credentialSubject ? Object.keys(result.vc.credentialSubject) : [],
-                    dataSource: dataSource,
-                    dataKeys: dataToDisplay ? Object.keys(dataToDisplay) : [],
-                    fullResult: result
-                  });
-                  
-                  if (!dataToDisplay) {
-                    return (
-                      <p style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
-                        No credential data available
-                      </p>
-                    );
-                  }
-                  
-                  // Filter and display fields
-                  const entries = Object.entries(dataToDisplay)
-                    .filter(([key]) => {
-                      // Keep all fields except these technical ones
-                      return key !== 'id' && key !== 'documentHash';
-                    });
-                  
-                  if (entries.length === 0) {
-                    return (
-                      <p style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
-                        Only technical fields were disclosed (ID, Document Hash)
-                      </p>
-                    );
-                  }
-                  
-                  return entries.map(([key, value]) => (
-                    <DetailField 
-                      key={key}
-                      label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
-                      value={String(value)}
-                    />
-                  ));
-                })()}
-              </div>
-            </div>
-
-            {/* Verification Checks */}
-            <h4 style={{ 
-              fontSize: 'var(--font-size-base)',
-              fontWeight: '600',
-              marginBottom: '12px',
-              color: 'var(--color-text-primary)'
-            }}>
-              Verification Checks
-            </h4>
-            <div style={{ display: 'grid', gap: '8px', marginBottom: '24px' }}>
-              <CheckRow label="Structure Valid" value={result.structureValid} />
-              <CheckRow label="IPFS Valid" value={result.ipfsValid} />
-              <CheckRow label="Blockchain Valid" value={result.blockchainValid} />
-              <CheckRow label="Hash Match" value={result.hashMatch} />
-              <CheckRow label="Not Revoked" value={!result.revoked} />
-              {result.bbsProofValid !== undefined && (
-                <CheckRow label="BBS+ Proof Valid" value={result.bbsProofValid} />
-              )}
-            </div>
-
-            {/* Credential Details */}
-            {result.details && (
-              <>
-                <h4 style={{ 
-                  fontSize: 'var(--font-size-base)',
-                  fontWeight: '600',
-                  marginBottom: '12px',
-                  color: 'var(--color-text-primary)'
-                }}>
-                  Credential Details
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-                  {result.details.issuer && (
-                    <DetailField label="Issuer DID" value={result.details.issuer} mono />
-                  )}
-                  {result.details.subject && (
-                    <DetailField label="Subject DID" value={result.details.subject} mono />
-                  )}
-                  {result.details.issuanceDate && (
-                    <DetailField label="Issuance Date" value={new Date(result.details.issuanceDate).toLocaleString()} />
-                  )}
-                  {result.details.proofType && (
-                    <DetailField label="Proof Type" value={result.details.proofType} />
-                  )}
-                </div>
-              </>
-            )}
-
-            {/* Blockchain Info */}
-            {result.details?.blockchain && (
-              <>
-                <h4 style={{ 
-                  fontSize: 'var(--font-size-base)',
-                  fontWeight: '600',
-                  marginBottom: '12px',
-                  color: 'var(--color-text-primary)'
-                }}>
-                  Blockchain Information
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-                  <DetailField label="Issuer Address" value={result.details.blockchain.issuer} mono />
-                  <DetailField label="Timestamp" value={result.details.blockchain.timestamp} />
-                  <DetailField label="IPFS CID" value={result.details.blockchain.ipfsCID} mono />
-                  <DetailField 
-                    label="Revoked" 
-                    value={result.details.blockchain.revoked ? 'Yes' : 'No'}
-                    valueColor={result.details.blockchain.revoked ? 'var(--color-error)' : 'var(--color-success)'}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </CardDetailsDrawer>
-    </div>
-  );
-}
-
-// Helper Components
-function CheckRow({ label, value }) {
-  const icon = value === true ? '✅' : value === false ? '❌' : '⚠️';
-  const color = value === true ? 'var(--color-success)' : value === false ? 'var(--color-error)' : 'var(--color-warning)';
-  
-  return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '12px',
-      background: 'rgba(0,0,0,0.02)',
-      borderRadius: 'var(--radius-sm)'
-    }}>
-      <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-        {label}
-      </span>
-      <span style={{ fontSize: 'var(--font-size-base)', color, fontWeight: '600' }}>
-        {icon}
-      </span>
-    </div>
-  );
-}
-
-function DetailField({ label, value, mono = false, valueColor = 'var(--color-text-primary)' }) {
-  return (
-    <div style={{
-      padding: '12px',
-      background: 'rgba(0,0,0,0.02)',
-      borderRadius: 'var(--radius-sm)'
-    }}>
-      <div style={{
-        fontSize: 'var(--font-size-xs)',
-        color: 'var(--color-text-secondary)',
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-        marginBottom: '4px'
-      }}>
-        {label}
-      </div>
-      <div style={{
-        fontSize: 'var(--font-size-sm)',
-        color: valueColor,
-        fontWeight: '600',
-        fontFamily: mono ? 'monospace' : 'inherit',
-        wordBreak: 'break-all'
-      }}>
-        {value || 'N/A'}
-      </div>
-    </div>
+    </AnimatedPage>
   );
 }

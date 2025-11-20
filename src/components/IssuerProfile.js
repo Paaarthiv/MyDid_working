@@ -48,10 +48,10 @@ function IssuerProfile() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl shadow-2xl shadow-blue-500/50 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#141E30] to-[#35577D] rounded-3xl shadow-2xl shadow-[#35577D]/50 mb-6">
             <UserIcon className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.5)]">
+          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.5)]">
             Issuer Profile
           </h1>
           <p className="text-slate-400 text-lg">Your identity and credentials information</p>
@@ -68,7 +68,7 @@ function IssuerProfile() {
           <motion.div variants={itemVariants} className="glass-card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#141E30] to-[#35577D] rounded-xl flex items-center justify-center">
                   <Wallet className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -100,7 +100,7 @@ function IssuerProfile() {
           <motion.div variants={itemVariants} className="glass-card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -112,17 +112,17 @@ function IssuerProfile() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCopy(did, 'did')}
-                className="p-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg transition-all"
+                className="p-2 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-lg transition-all"
               >
                 {copiedField === 'did' ? (
                   <CheckCircle className="w-5 h-5 text-green-400" />
                 ) : (
-                  <Copy className="w-5 h-5 text-purple-400" />
+                  <Copy className="w-5 h-5 text-indigo-400" />
                 )}
               </motion.button>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-              <code className="text-purple-300 text-sm font-mono break-all leading-relaxed">
+              <code className="text-indigo-300 text-sm font-mono break-all leading-relaxed">
                 {did}
               </code>
             </div>
@@ -132,7 +132,7 @@ function IssuerProfile() {
           <motion.div variants={itemVariants} className="glass-card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
                   <Key className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -144,24 +144,24 @@ function IssuerProfile() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCopy(publicKey, 'publicKey')}
-                className="p-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg transition-all"
+                className="p-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg transition-all"
               >
                 {copiedField === 'publicKey' ? (
                   <CheckCircle className="w-5 h-5 text-green-400" />
                 ) : (
-                  <Copy className="w-5 h-5 text-cyan-400" />
+                  <Copy className="w-5 h-5 text-blue-400" />
                 )}
               </motion.button>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-              <code className="text-cyan-300 text-sm font-mono break-all leading-relaxed">
+              <code className="text-blue-300 text-sm font-mono break-all leading-relaxed">
                 {publicKey}
               </code>
             </div>
           </motion.div>
 
           {/* Info Note */}
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4"
           >

@@ -90,18 +90,17 @@ function IssuerLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background - Blue Theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900" />
-      
+      {/* Decorative background orbs - removed duplicate background gradient, AnimatedPage handles it */}
+
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"
+        className="absolute top-20 left-20 w-72 h-72 bg-[#35577D]/20 rounded-full blur-3xl"
       />
       <motion.div
         animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"
+        className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"
       />
 
       {/* Login Card */}
@@ -129,7 +128,7 @@ function IssuerLogin() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl shadow-2xl shadow-blue-500/50 mb-6"
+            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#141E30] to-[#35577D] rounded-2xl shadow-2xl shadow-[#35577D]/50 mb-6"
           >
             <Building2 className="w-10 h-10 text-white" />
           </motion.div>
@@ -139,11 +138,11 @@ function IssuerLogin() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+            className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent"
           >
             Issuer Portal
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -172,9 +171,9 @@ function IssuerLogin() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
-                  className="flex flex-col items-center space-y-2 p-3 bg-blue-800/20 rounded-xl border border-blue-700/50"
+                  className="flex flex-col items-center space-y-2 p-3 bg-[#35577D]/20 rounded-xl border border-[#35577D]/50"
                 >
-                  <Icon className="w-5 h-5 text-blue-400" />
+                  <Icon className="w-5 h-5 text-blue-300" />
                   <span className="text-xs text-slate-300">{feature.label}</span>
                 </motion.div>
               );
@@ -190,7 +189,7 @@ function IssuerLogin() {
             whileTap={{ scale: 0.95 }}
             onClick={connectWallet}
             disabled={isConnecting}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blue-500/50 transition-all duration-300 flex items-center justify-center space-x-3 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-[#141E30] to-[#35577D] hover:from-[#0F1922] hover:to-[#2E4A6B] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-[#35577D]/50 transition-all duration-300 flex items-center justify-center space-x-3 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isConnecting ? (
               <>
@@ -217,7 +216,7 @@ function IssuerLogin() {
               href="https://metamask.io/download.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300 transition-colors underline"
+              className="text-blue-300 hover:text-blue-200 transition-colors underline"
             >
               Install it here
             </a>

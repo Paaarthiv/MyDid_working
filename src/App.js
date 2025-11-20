@@ -14,9 +14,12 @@ import IssuerProfile from "./components/IssuerProfile";
 import HolderDashboard from "./components/HolderDashboard";
 import HolderMyVCs from "./components/HolderMyVCs";
 import HolderRequestCredential from "./components/HolderRequestCredential";
+import HolderMyRequests from "./components/HolderMyRequests";
 import HolderProfile from "./components/HolderProfile";
 import VerifierDashboard from "./components/VerifierDashboard";
+import VerifierDashboardNew from "./components/VerifierDashboardNew";
 import VerifierHistory from "./components/VerifierHistory";
+import VerifierProfile from "./components/VerifierProfile";
 import VCForm from "./components/Form";
 import ViewVC from "./components/VCView";
 import ViewVCDetail from "./components/ViewVCDetail";
@@ -30,31 +33,31 @@ import "./styles/walletTheme.css";
 // Protected Route Component
 function ProtectedRoute({ children, allowedRole }) {
   const { isAuthenticated, userRole } = useAuth();
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
-  
+
   if (allowedRole && userRole !== allowedRole) {
     return <Navigate to="/" replace />;
   }
-  
+
   return children;
 }
 
 function AppContent() {
   const location = useLocation();
   const { logout, userAddress } = useAuth();
-  const isLoginPage = location.pathname === '/' || 
-                      location.pathname === '/issuer-login' || 
-                      location.pathname === '/holder-login' || 
-                      location.pathname === '/verifier-login';
+  const isLoginPage = location.pathname === '/' ||
+    location.pathname === '/issuer-login' ||
+    location.pathname === '/holder-login' ||
+    location.pathname === '/verifier-login';
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Show Navbar on all pages except login */}
       {!isLoginPage && <Navbar userAddress={userAddress} onLogout={logout} />}
-      
+
       {/* Main Content */}
       <main className={`flex-1 ${!isLoginPage ? 'pt-16' : ''}`}>
         <AnimatePresence mode="wait">
@@ -174,6 +177,14 @@ function AppContent() {
               }
             />
             <Route
+              path="/holder/my-requests"
+              element={
+                <ProtectedRoute allowedRole="holder">
+                  <HolderMyRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/holder/profile"
               element={
                 <ProtectedRoute allowedRole="holder">
@@ -195,7 +206,7 @@ function AppContent() {
               path="/verifier"
               element={
                 <ProtectedRoute allowedRole="verifier">
-                  <VerifierDashboard />
+                  <VerifierDashboardNew />
                 </ProtectedRoute>
               }
             />
@@ -204,6 +215,14 @@ function AppContent() {
               element={
                 <ProtectedRoute allowedRole="verifier">
                   <VerifierHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/verifier/profile"
+              element={
+                <ProtectedRoute allowedRole="verifier">
+                  <VerifierProfile />
                 </ProtectedRoute>
               }
             />

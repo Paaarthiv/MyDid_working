@@ -48,10 +48,10 @@ function HolderProfile() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl shadow-2xl shadow-green-500/50 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-3xl shadow-2xl shadow-purple-500/50 mb-6">
             <UserIcon className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-green-400 via-emerald-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(34,197,94,0.5)]">
+          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.5)]">
             Holder Profile
           </h1>
           <p className="text-slate-400 text-lg">Your identity and wallet information</p>
@@ -68,7 +68,7 @@ function HolderProfile() {
           <motion.div variants={itemVariants} className="glass-card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-xl flex items-center justify-center">
                   <Wallet className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -80,17 +80,17 @@ function HolderProfile() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCopy(userAddress, 'wallet')}
-                className="p-2 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 rounded-lg transition-all"
+                className="p-2 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-lg transition-all"
               >
                 {copiedField === 'wallet' ? (
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <CheckCircle className="w-5 h-5 text-pink-400" />
                 ) : (
-                  <Copy className="w-5 h-5 text-green-400" />
+                  <Copy className="w-5 h-5 text-purple-400" />
                 )}
               </motion.button>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-              <code className="text-green-300 text-sm font-mono break-all leading-relaxed">
+              <code className="text-purple-300 text-sm font-mono break-all leading-relaxed">
                 {userAddress}
               </code>
             </div>
@@ -100,7 +100,7 @@ function HolderProfile() {
           <motion.div variants={itemVariants} className="glass-card p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -112,33 +112,33 @@ function HolderProfile() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCopy(did, 'did')}
-                className="p-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg transition-all"
+                className="p-2 bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 rounded-lg transition-all"
               >
                 {copiedField === 'did' ? (
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <CheckCircle className="w-5 h-5 text-pink-400" />
                 ) : (
-                  <Copy className="w-5 h-5 text-emerald-400" />
+                  <Copy className="w-5 h-5 text-pink-400" />
                 )}
               </motion.button>
             </div>
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-              <code className="text-emerald-300 text-sm font-mono break-all leading-relaxed">
+              <code className="text-pink-300 text-sm font-mono break-all leading-relaxed">
                 {did}
               </code>
             </div>
           </motion.div>
 
           {/* Info Note */}
-          <motion.div 
+          <motion.div
             variants={itemVariants}
-            className="bg-green-500/10 border border-green-500/30 rounded-xl p-4"
+            className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4"
           >
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+              <Shield className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-green-300 text-sm font-semibold mb-1">Identity Information</p>
+                <p className="text-purple-300 text-sm font-semibold mb-1">Identity Information</p>
                 <p className="text-slate-400 text-xs leading-relaxed">
-                  Your wallet address and DID are used to receive and manage verifiable credentials. 
+                  Your wallet address and DID are used to receive and manage verifiable credentials.
                   Keep your private key secure and never share it with anyone.
                 </p>
               </div>

@@ -42,7 +42,7 @@ export default function IssuerViewIssued() {
       if (response.data.success && response.data.requests) {
         // Log all requests for debugging
         console.log("📋 All requests:", response.data.requests);
-        
+
         // Filter only approved requests (which have issued VCs)
         const approvedRequests = response.data.requests.filter(
           req => {
@@ -54,7 +54,7 @@ export default function IssuerViewIssued() {
             return req.status === "approved" && req.issuedVCCID;
           }
         );
-        
+
         console.log("✅ Approved requests with VCs:", approvedRequests.length);
 
         // Fetch full VC data from IPFS for each approved request
@@ -65,7 +65,7 @@ export default function IssuerViewIssued() {
               const vcResponse = await axios.get(
                 `http://localhost:5000/holder/vc/${req.issuedVCCID}`
               );
-              
+
               return {
                 vcCID: req.issuedVCCID,
                 holderAddress: req.holderAddress,
@@ -120,17 +120,17 @@ export default function IssuerViewIssued() {
   const handleDeleteCredential = async (vcCID, event) => {
     // Prevent card click event
     event.stopPropagation();
-    
+
     if (!window.confirm("Are you sure you want to remove this credential from your issued list? (It will still exist on IPFS and blockchain)")) {
       return;
     }
 
     try {
       console.log("🗑️ Deleting issued credential:", vcCID);
-      
+
       // Remove from local state immediately for better UX
       setCredentials(prevCreds => prevCreds.filter(cred => cred.vcCID !== vcCID));
-      
+
       alert("✅ Credential removed from your issued list");
     } catch (err) {
       console.error("❌ Error deleting credential:", err);
@@ -333,7 +333,7 @@ export default function IssuerViewIssued() {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
                         {/* Show different fields based on credential type */}
-                        {cred.credentialType === "Academic Certificate" ? (
+                        {(cred.credentialType?.includes("Academic") || cred.fullVC?.type?.some(t => t.includes("Academic"))) ? (
                           <>
                             <div>
                               <p className="text-xs text-slate-500 mb-1">Register Number</p>

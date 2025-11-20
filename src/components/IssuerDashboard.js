@@ -48,7 +48,7 @@ function IssuerDashboard() {
                 navigate("/");
               }
             }}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
+            className="px-6 py-3 bg-[#35577D] hover:bg-[#2E4A6B] text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
           >
             ← Back to Home
           </button>
@@ -60,10 +60,10 @@ function IssuerDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl shadow-lg shadow-blue-500/50 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#141E30] to-[#35577D] rounded-2xl shadow-lg shadow-[#35577D]/50 mb-4">
             <Building2 className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(59,130,246,0.5)]">
+          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
             Issuer Dashboard
           </h1>
           <p className="text-slate-400 text-lg">Issue and manage verifiable credentials</p>
@@ -81,9 +81,9 @@ function IssuerDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/issuer/requests")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-cyan-500/10 hover:border-blue-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-[#35577D]/10 hover:to-[#4A6B8F]/10 hover:border-[#35577D]/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#141E30] to-[#35577D] rounded-2xl flex items-center justify-center shadow-lg shadow-[#35577D]/30 group-hover:shadow-[#35577D]/50 transition-all">
               <FileText className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Handle Credential Requests</h3>
@@ -95,9 +95,9 @@ function IssuerDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/issuer/view-issued")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-blue-500/10 hover:to-cyan-500/10 hover:border-blue-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-[#35577D]/10 hover:to-[#4A6B8F]/10 hover:border-[#35577D]/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#141E30] to-[#35577D] rounded-2xl flex items-center justify-center shadow-lg shadow-[#35577D]/30 group-hover:shadow-[#35577D]/50 transition-all">
               <Shield className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">View Issued Credentials</h3>

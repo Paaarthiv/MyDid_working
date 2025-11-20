@@ -90,18 +90,17 @@ function HolderLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background - Green Theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-green-900/20 to-slate-900" />
-      
+      {/* Decorative background orbs - removed duplicate background gradient, AnimatedPage handles it */}
+
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 left-20 w-72 h-72 bg-green-500/20 rounded-full blur-3xl"
+        className="absolute top-20 left-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"
       />
       <motion.div
         animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-20 right-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"
+        className="absolute bottom-20 right-20 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl"
       />
 
       {/* Login Card */}
@@ -129,7 +128,7 @@ function HolderLogin() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-2xl shadow-green-500/50 mb-6"
+            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-2xl shadow-2xl shadow-purple-500/50 mb-6"
           >
             <User className="w-10 h-10 text-white" />
           </motion.div>
@@ -139,11 +138,11 @@ function HolderLogin() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-4xl font-bold mb-3 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent"
+            className="text-4xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
           >
             Holder Portal
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -172,9 +171,9 @@ function HolderLogin() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
-                  className="flex flex-col items-center space-y-2 p-3 bg-green-800/20 rounded-xl border border-green-700/50"
+                  className="flex flex-col items-center space-y-2 p-3 bg-purple-800/20 rounded-xl border border-purple-700/50"
                 >
-                  <Icon className="w-5 h-5 text-green-400" />
+                  <Icon className="w-5 h-5 text-purple-400" />
                   <span className="text-xs text-slate-300">{feature.label}</span>
                 </motion.div>
               );
@@ -190,7 +189,7 @@ function HolderLogin() {
             whileTap={{ scale: 0.95 }}
             onClick={connectWallet}
             disabled={isConnecting}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-green-500/50 transition-all duration-300 flex items-center justify-center space-x-3 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-[#2D1E2F] to-[#4E2A4F] hover:from-[#231823] hover:to-[#3E2240] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-purple-500/50 transition-all duration-300 flex items-center justify-center space-x-3 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isConnecting ? (
               <>
@@ -217,7 +216,7 @@ function HolderLogin() {
               href="https://metamask.io/download.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-green-400 hover:text-green-300 transition-colors underline"
+              className="text-purple-400 hover:text-purple-300 transition-colors underline"
             >
               Install it here
             </a>
@@ -232,11 +231,11 @@ function HolderLogin() {
           className="mt-6 flex items-center justify-center space-x-6 text-sm text-slate-400"
         >
           <div className="flex items-center space-x-2">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CheckCircle className="w-4 h-4 text-pink-400" />
             <span>Zero-Knowledge Proofs</span>
           </div>
           <div className="flex items-center space-x-2">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CheckCircle className="w-4 h-4 text-pink-400" />
             <span>Selective Disclosure</span>
           </div>
         </motion.div>

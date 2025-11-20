@@ -11,7 +11,7 @@ export default function IssuerCredentialView() {
   const { cid } = useParams();
   const navigate = useNavigate();
   const { userRole } = useAuth();
-  
+
   const [credential, setCredential] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,7 +36,7 @@ export default function IssuerCredentialView() {
 
       console.log("Fetching credential from IPFS:", cid);
       const response = await axios.get(`http://localhost:5000/fetchVC/${cid}`);
-      
+
       if (response.data.success) {
         setCredential({
           cid: cid,
@@ -116,6 +116,19 @@ export default function IssuerCredentialView() {
   const subject = vc.credentialSubject || {};
   const issuer = vc.issuer || {};
 
+  // Helper functions to handle both issuer formats
+  const getIssuerDID = () => {
+    if (typeof issuer === 'string') return issuer; // Academic Certificate format
+    if (issuer.id) return issuer.id; // Student ID format
+    return "N/A";
+  };
+
+  const getIssuerName = () => {
+    if (typeof issuer === 'object' && issuer.name) return issuer.name; // Student ID format
+    if (typeof issuer === 'string') return "Digital Identity Management System"; // Academic Certificate - default name
+    return "N/A";
+  };
+
   return (
     <AnimatedPage className="min-h-screen py-12 px-4">
       <div className="max-w-5xl mx-auto">
@@ -193,20 +206,57 @@ export default function IssuerCredentialView() {
                   <p className="text-white font-semibold text-lg">{subject.name || "N/A"}</p>
                 </div>
 
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                  <p className="text-slate-400 text-sm mb-1">Roll Number</p>
-                  <p className="text-white font-semibold text-lg">{subject.rollNumber || "N/A"}</p>
-                </div>
+                {/* Conditional rendering based on credential type */}
+                {vc.type?.includes("AcademicCertificate") ? (
+                  <>
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Register Number</p>
+                      <p className="text-white font-semibold text-lg">{subject.registerNumber || "N/A"}</p>
+                    </div>
 
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                  <p className="text-slate-400 text-sm mb-1">Date of Birth</p>
-                  <p className="text-white font-semibold text-lg">{subject.dateOfBirth || "N/A"}</p>
-                </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Degree</p>
+                      <p className="text-white font-semibold text-lg">{subject.degree || "N/A"}</p>
+                    </div>
 
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                  <p className="text-slate-400 text-sm mb-1">Department</p>
-                  <p className="text-white font-semibold text-lg">{subject.department || "N/A"}</p>
-                </div>
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Branch</p>
+                      <p className="text-white font-semibold text-lg">{subject.branch || "N/A"}</p>
+                    </div>
+
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">University</p>
+                      <p className="text-white font-semibold text-lg">{subject.university || "N/A"}</p>
+                    </div>
+
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">CGPA</p>
+                      <p className="text-white font-semibold text-lg">{subject.cgpa || "N/A"}</p>
+                    </div>
+
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Class</p>
+                      <p className="text-white font-semibold text-lg">{subject.class || "N/A"}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Roll Number</p>
+                      <p className="text-white font-semibold text-lg">{subject.rollNumber || "N/A"}</p>
+                    </div>
+
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Date of Birth</p>
+                      <p className="text-white font-semibold text-lg">{subject.dateOfBirth || "N/A"}</p>
+                    </div>
+
+                    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                      <p className="text-slate-400 text-sm mb-1">Department</p>
+                      <p className="text-white font-semibold text-lg">{subject.department || "N/A"}</p>
+                    </div>
+                  </>
+                )}
 
                 <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 md:col-span-2">
                   <p className="text-slate-400 text-sm mb-1">Subject DID</p>
@@ -232,12 +282,12 @@ export default function IssuerCredentialView() {
               <div className="space-y-3">
                 <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                   <p className="text-slate-400 text-sm mb-1">Issuer Name</p>
-                  <p className="text-white font-semibold">{issuer.name || "N/A"}</p>
+                  <p className="text-white font-semibold">{getIssuerName()}</p>
                 </div>
 
                 <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                   <p className="text-slate-400 text-sm mb-1">Issuer DID</p>
-                  <p className="text-purple-400 font-mono text-sm break-all">{issuer.id || "N/A"}</p>
+                  <p className="text-purple-400 font-mono text-sm break-all">{getIssuerDID()}</p>
                 </div>
 
                 <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">

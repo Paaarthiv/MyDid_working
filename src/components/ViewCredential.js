@@ -8,7 +8,7 @@ import "../styles/animations.css";
 export default function ViewCredential() {
   const { cid } = useParams();
   const navigate = useNavigate();
-  
+
   const [credential, setCredential] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,7 +29,7 @@ export default function ViewCredential() {
       if (!credData || !credData.vc) {
         console.log("Fetching from IPFS...");
         const response = await axios.get(`http://localhost:5000/fetchVC/${cid}`);
-        
+
         if (response.data.success) {
           credData = {
             cid: cid,
@@ -48,7 +48,7 @@ export default function ViewCredential() {
       console.log("Issuer:", credData.vc?.issuer);
       console.log("Subject:", credData.vc?.credentialSubject);
       console.log("Subject ID:", credData.vc?.credentialSubject?.id);
-      
+
       if (!credData.vc?.proof) {
         console.error("❌ VC is missing proof object!");
         console.log("Full VC:", JSON.stringify(credData.vc, null, 2));
@@ -118,7 +118,7 @@ export default function ViewCredential() {
   const vc = credential.vc;
   const subject = vc.credentialSubject || {};
   const proof = vc.proof || {};
-  
+
   // Helper function to safely get issuer DID
   const getIssuerDID = () => {
     if (!vc.issuer) return "N/A";
@@ -126,7 +126,7 @@ export default function ViewCredential() {
     if (vc.issuer.id) return vc.issuer.id;
     return "N/A";
   };
-  
+
   // Helper function to safely get subject ID
   const getSubjectID = () => {
     if (subject.id) return subject.id;
@@ -169,24 +169,55 @@ export default function ViewCredential() {
               )}
               <div className="flex-1">
                 <h2 className="text-3xl font-bold mb-2">{subject.name || "N/A"}</h2>
-                <div className="grid grid-cols-2 gap-4 text-indigo-100">
-                  <div>
-                    <p className="text-sm opacity-80">Roll Number</p>
-                    <p className="font-semibold">{subject.rollNumber || "N/A"}</p>
+
+                {/* Conditional rendering based on credential type */}
+                {vc.type?.includes("AcademicCertificate") ? (
+                  <div className="grid grid-cols-2 gap-4 text-indigo-100">
+                    <div>
+                      <p className="text-sm opacity-80">Register Number</p>
+                      <p className="font-semibold">{subject.registerNumber || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">Degree</p>
+                      <p className="font-semibold">{subject.degree || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">Branch</p>
+                      <p className="font-semibold">{subject.branch || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">University</p>
+                      <p className="font-semibold">{subject.university || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">CGPA</p>
+                      <p className="font-semibold">{subject.cgpa || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">Class</p>
+                      <p className="font-semibold">{subject.class || "N/A"}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm opacity-80">Department</p>
-                    <p className="font-semibold">{subject.department || "N/A"}</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 text-indigo-100">
+                    <div>
+                      <p className="text-sm opacity-80">Roll Number</p>
+                      <p className="font-semibold">{subject.rollNumber || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">Department</p>
+                      <p className="font-semibold">{subject.department || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">Date of Birth</p>
+                      <p className="font-semibold">{subject.dateOfBirth || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm opacity-80">Document Type</p>
+                      <p className="font-semibold">{subject.documentType || "N/A"}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm opacity-80">Date of Birth</p>
-                    <p className="font-semibold">{subject.dateOfBirth || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-80">Document Type</p>
-                    <p className="font-semibold">{subject.documentType || "N/A"}</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -305,21 +336,21 @@ export default function ViewCredential() {
           >
             🔐 Generate Proof
           </button>
-          
+
           <button
             onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${cid}`, "_blank")}
             className="px-6 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             🌐 View on IPFS
           </button>
-          
+
           <button
             onClick={() => navigate("/verifier")}
             className="px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             🔍 Verify Credential
           </button>
-          
+
           <button
             onClick={() => {
               const dataStr = JSON.stringify(vc, null, 2);

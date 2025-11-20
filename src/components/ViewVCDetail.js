@@ -118,9 +118,22 @@ export default function ViewVCDetail() {
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">
                   {subject.name || "N/A"}
                 </h2>
-                <p className="text-gray-600">Roll Number: {subject.rollNumber || "N/A"}</p>
-                <p className="text-gray-600">Department: {subject.department || "N/A"}</p>
-                <p className="text-gray-600">DOB: {subject.dateOfBirth || "N/A"}</p>
+
+                {/* Conditional rendering based on credential type */}
+                {vc.type?.includes("AcademicCertificate") ? (
+                  <>
+                    <p className="text-gray-600">Register Number: {subject.registerNumber || "N/A"}</p>
+                    <p className="text-gray-600">Degree: {subject.degree || "N/A"}</p>
+                    <p className="text-gray-600">Branch: {subject.branch || "N/A"}</p>
+                    <p className="text-gray-600">University: {subject.university || "N/A"}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-600">Roll Number: {subject.rollNumber || "N/A"}</p>
+                    <p className="text-gray-600">Department: {subject.department || "N/A"}</p>
+                    <p className="text-gray-600">DOB: {subject.dateOfBirth || "N/A"}</p>
+                  </>
+                )}
               </div>
             </div>
           )}

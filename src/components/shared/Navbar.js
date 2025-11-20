@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { 
-  Home, 
-  FileText, 
-  Shield, 
-  User, 
-  Menu, 
+import {
+  Home,
+  FileText,
+  Shield,
+  User,
+  Menu,
   X,
   Wallet,
   LogOut,
@@ -43,6 +43,7 @@ export default function Navbar({ userAddress, onLogout }) {
         return [
           { path: '/verifier-dashboard', label: 'Dashboard', icon: Home },
           { path: '/verifier', label: 'Verify', icon: Shield },
+          { path: '/verifier/profile', label: 'Profile', icon: User },
         ];
       default:
         return [];
@@ -58,25 +59,25 @@ export default function Navbar({ userAddress, onLogout }) {
         return {
           icon: Building2,
           label: 'Issuer Portal',
-          color: 'from-blue-400 to-cyan-400',
-          bgColor: 'bg-blue-500/20',
-          borderColor: 'border-blue-500/30'
+          color: 'from-blue-400 to-indigo-400',
+          bgColor: 'bg-[#35577D]/20',
+          borderColor: 'border-[#35577D]/30'
         };
       case 'holder':
         return {
           icon: User,
           label: 'Holder Portal',
-          color: 'from-green-400 to-emerald-400',
-          bgColor: 'bg-green-500/20',
-          borderColor: 'border-green-500/30'
+          color: 'from-purple-400 to-pink-400',
+          bgColor: 'bg-purple-500/20',
+          borderColor: 'border-purple-500/30'
         };
       case 'verifier':
         return {
           icon: Search,
           label: 'Verifier Portal',
-          color: 'from-purple-400 to-violet-400',
-          bgColor: 'bg-purple-500/20',
-          borderColor: 'border-purple-500/30'
+          color: 'from-emerald-400 to-green-400',
+          bgColor: 'bg-emerald-500/20',
+          borderColor: 'border-emerald-500/30'
         };
       default:
         return null;
@@ -92,11 +93,25 @@ export default function Navbar({ userAddress, onLogout }) {
     navigate('/login');
   };
 
+  // Get portal background for navbar
+  const getNavbarBackground = () => {
+    const pathname = location.pathname;
+    if (pathname.startsWith('/issuer')) {
+      return 'linear-gradient(135deg, rgba(20, 30, 48, 0.95), rgba(53, 87, 125, 0.95))';
+    } else if (pathname.startsWith('/holder')) {
+      return 'linear-gradient(135deg, rgba(45, 30, 47, 0.95), rgba(78, 42, 79, 0.95))';
+    } else if (pathname.startsWith('/verifier')) {
+      return 'linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(40, 98, 58, 0.95))';
+    }
+    return 'rgba(15, 23, 42, 0.95)'; // Default
+  };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10"
+      className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-lg"
+      style={{ background: getNavbarBackground() }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -110,7 +125,7 @@ export default function Navbar({ userAddress, onLogout }) {
             >
               <Shield className="w-7 h-7 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
             </motion.div>
-            <span 
+            <span
               className="text-2xl font-extrabold hidden sm:block"
               style={{
                 background: 'linear-gradient(135deg, #818cf8 0%, #60a5fa 50%, #a78bfa 100%)',
@@ -138,11 +153,10 @@ export default function Navbar({ userAddress, onLogout }) {
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${
-                      isActive(item.path)
-                        ? 'bg-indigo-600/20 text-indigo-400 shadow-lg shadow-indigo-500/20'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    }`}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 ${isActive(item.path)
+                      ? 'bg-indigo-600/20 text-indigo-400 shadow-lg shadow-indigo-500/20'
+                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                      }`}
                   >
                     <Icon className="w-4 h-4" />
                     <span className="font-medium">{item.label}</span>
@@ -228,18 +242,17 @@ export default function Navbar({ userAddress, onLogout }) {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                      isActive(item.path)
-                        ? 'bg-indigo-600/20 text-indigo-400'
-                        : 'text-slate-300 hover:bg-white/10'
-                    }`}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive(item.path)
+                      ? 'bg-indigo-600/20 text-indigo-400'
+                      : 'text-slate-300 hover:bg-white/10'
+                      }`}
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.label}</span>
                   </Link>
                 );
               })}
-              
+
               {userAddress && (
                 <>
                   {/* Mobile Role Indicator */}

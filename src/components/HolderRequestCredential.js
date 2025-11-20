@@ -2,76 +2,37 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import { Send, FileText, User, MessageSquare, CheckCircle, AlertCircle, Clock, XCircle, CreditCard, Hash, GraduationCap, BookOpen, Link2, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Send, FileText, User, MessageSquare, CheckCircle, AlertCircle, CreditCard, Hash, GraduationCap, BookOpen, Link2, Sparkles, Clock } from "lucide-react";
 import AnimatedPage from "./shared/AnimatedPage";
 
 export default function HolderRequestCredential() {
   const { userAddress, did } = useAuth();
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [credentialType, setCredentialType] = useState("Student ID");
   const [holderName, setHolderName] = useState("");
   const [verificationID, setVerificationID] = useState("");
-  const [studentIDDocument, setStudentIDDocument] = useState(null); // For Academic Certificate requests
+  const [studentIDDocument, setStudentIDDocument] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const [myRequests, setMyRequests] = useState([]);
-  const [loadingRequests, setLoadingRequests] = useState(true);
-  
+
   // For Academic Certificate - attach existing Student ID VC
   const [myStudentIDVCs, setMyStudentIDVCs] = useState([]);
   const [selectedStudentVC, setSelectedStudentVC] = useState("");
   const [loadingVCs, setLoadingVCs] = useState(false);
 
-  useEffect(() => {
-    fetchMyRequests();
-  }, [userAddress]);
 
-  const fetchMyRequests = async () => {
-    try {
-      setLoadingRequests(true);
-      const response = await axios.get(`http://localhost:5000/holder/myRequests/${userAddress}`);
-      if (response.data.success) {
-        setMyRequests(response.data.requests);
-      }
-    } catch (err) {
-      console.error("Error fetching requests:", err);
-    } finally {
-      setLoadingRequests(false);
-    }
-  };
 
-  const handleDeleteRequest = async (requestId) => {
-    if (!window.confirm("Are you sure you want to delete this request?")) {
-      return;
-    }
 
-    try {
-      console.log("🗑️ Deleting request:", requestId);
-      
-      // Delete from backend
-      const response = await axios.delete(`http://localhost:5000/holder/request/${requestId}`, {
-        data: { holderAddress: userAddress }
-      });
-
-      if (response.data.success) {
-        console.log("✅ Request deleted successfully");
-        // Update local state
-        setMyRequests(prevRequests => prevRequests.filter(req => (req.requestId || req.id) !== requestId));
-        alert("✅ Request deleted successfully");
-      }
-    } catch (err) {
-      console.error("❌ Error deleting request:", err);
-      alert("Failed to delete request: " + (err.response?.data?.message || err.message));
-    }
-  };
 
   const fetchMyStudentIDVCs = async () => {
     try {
       setLoadingVCs(true);
       console.log("📚 Fetching Student ID VCs for holder:", userAddress);
       const response = await axios.get(`http://localhost:5000/holder/vcs/${userAddress}`);
-      
+
       if (response.data.success && response.data.vcs) {
         // Filter only Student ID VCs
         const studentIDs = response.data.vcs.filter(vc => {
@@ -113,9 +74,14 @@ export default function HolderRequestCredential() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!message.trim()) {
       setError("Please enter a message");
+      return;
+    }
+
+    if (!holderName.trim()) {
+      setError("Please enter your name");
       return;
     }
 
@@ -189,7 +155,7 @@ export default function HolderRequestCredential() {
       // Step 2: Request challenge nonce
       console.log("🔐 Step 2: Requesting challenge nonce...");
       console.log('Sending to challenge/request:', { requestId });
-      
+
       let challengeResponse;
       try {
         challengeResponse = await axios.post("http://localhost:5000/challenge/request", {
@@ -215,7 +181,7 @@ export default function HolderRequestCredential() {
       // Step 3: Sign message with MetaMask
       console.log("✍️ Step 3: Requesting signature from MetaMask...");
       setError("Please sign the message in MetaMask to prove DID ownership...");
-      
+
       let signature;
       try {
         if (!window.ethereum) {
@@ -238,7 +204,7 @@ export default function HolderRequestCredential() {
       // Step 4: Verify challenge
       console.log("🔍 Step 4: Verifying signature...");
       setError("Verifying your signature...");
-      
+
       const verifyResponse = await axios.post("http://localhost:5000/challenge/verify", {
         requestId,
         nonceId,
@@ -259,10 +225,7 @@ export default function HolderRequestCredential() {
       setHolderName("");
       setCredentialType("Student ID");
       setVerificationID("");
-      
-      // Refresh requests list
-      fetchMyRequests();
-      
+
       // Hide success message after 5 seconds
       setTimeout(() => setSubmitSuccess(false), 5000);
 
@@ -271,55 +234,6 @@ export default function HolderRequestCredential() {
       setError(err.response?.data?.message || err.message || "Failed to submit credential request");
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "pending":
-        return (
-          <span className="flex items-center space-x-1 px-3 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded-full border border-yellow-500/30">
-            <Clock className="w-3 h-3" />
-            <span>Pending Verification</span>
-          </span>
-        );
-      case "verified":
-        return (
-          <span className="flex items-center space-x-1 px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full border border-blue-500/30">
-            <CheckCircle className="w-3 h-3" />
-            <span>Verified</span>
-          </span>
-        );
-      case "approved":
-        return (
-          <span className="flex items-center space-x-1 px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full border border-green-500/30">
-            <CheckCircle className="w-3 h-3" />
-            <span>Approved</span>
-          </span>
-        );
-      case "rejected":
-        return (
-          <span className="flex items-center space-x-1 px-3 py-1 bg-red-500/20 text-red-400 text-xs font-semibold rounded-full border border-red-500/30">
-            <XCircle className="w-3 h-3" />
-            <span>Rejected</span>
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const formatDate = (dateString) => {
-    try {
-      return new Date(dateString).toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    } catch {
-      return dateString;
     }
   };
 
@@ -334,12 +248,12 @@ export default function HolderRequestCredential() {
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-6">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl flex items-center justify-center shadow-xl shadow-green-500/20 transform hover:scale-105 transition-transform">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center shadow-xl shadow-purple-500/20 transform hover:scale-105 transition-transform">
                 <Send className="w-10 h-10 text-white" />
               </div>
             </div>
             <div className="flex-1">
-              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">
+              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.5)]">
                 Request Credential
               </h1>
               <p className="text-slate-400 text-lg">Submit a verified request to issuers for digital credentials</p>
@@ -363,12 +277,12 @@ export default function HolderRequestCredential() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-green-500/10 backdrop-blur-xl border border-green-500/20 rounded-3xl shadow-2xl p-12 relative overflow-hidden w-full"
+            className="bg-purple-500/10 backdrop-blur-xl border border-purple-500/20 rounded-3xl shadow-2xl p-12 relative overflow-hidden w-full"
           >
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-slate-500/5 to-slate-600/5 rounded-full blur-3xl -z-10"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-slate-500/5 to-slate-600/5 rounded-full blur-3xl -z-10"></div>
-            
+
             <div className="w-full px-2 sm:px-4">
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -421,111 +335,112 @@ export default function HolderRequestCredential() {
               </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6 lg:space-y-8 w-full px-2 sm:px-4">
+            <form onSubmit={handleSubmit} className="space-y-6 w-full px-2 sm:px-4">
               {/* Two Column Layout for Identity and Credential Details */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 {/* Section 1: Identity Information */}
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 lg:p-16 border-2 border-slate-300 shadow-2xl">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-800">Identity Information</h3>
-                    <p className="text-xs text-slate-500">Your verified identity details</p>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Your DID */}
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                      <Hash className="w-4 h-4 text-slate-500" />
-                      Your DID (Auto-filled)
-                    </label>
-                    <div className="bg-white border-2 border-slate-300 rounded-xl p-8 hover:border-slate-400 transition-all">
-                      <code className="text-slate-700 text-sm font-mono break-all leading-relaxed">{did}</code>
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-300 shadow-2xl">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800">Identity Information</h3>
+                      <p className="text-xs text-slate-500">Your verified identity details</p>
                     </div>
                   </div>
 
-                  {/* Your Name */}
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                      <User className="w-4 h-4 text-slate-500" />
-                      Your Name <span className="text-xs text-slate-500 font-normal">(Optional)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={holderName}
-                      onChange={(e) => setHolderName(e.target.value)}
-                      placeholder="Enter your full name"
-                      className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/20 hover:border-slate-400 transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
-                {/* Section 2: Credential Details */}
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 lg:p-16 border-2 border-slate-300 shadow-2xl">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
-                    <CreditCard className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-800">Credential Details</h3>
-                    <p className="text-xs text-slate-500">Specify what you're requesting</p>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Credential Type */}
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-slate-500" />
-                      Credential Type <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={credentialType}
-                        onChange={(e) => {
-                          setCredentialType(e.target.value);
-                          setVerificationID("");
-                        }}
-                        required
-                        className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg focus:border-green-500 focus:ring-4 focus:ring-green-500/20 hover:border-slate-400 transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="Student ID">🎓 Student ID</option>
-                        <option value="Academic Certificate">📜 Academic Certificate</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                  <div className="space-y-4">
+                    {/* Your DID */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                        <Hash className="w-4 h-4 text-slate-500" />
+                        Your DID (Auto-filled)
+                      </label>
+                      <div className="bg-white border-2 border-slate-300 rounded-xl p-4 hover:border-slate-400 transition-all">
+                        <code className="text-purple-600 text-sm font-mono break-all leading-relaxed font-semibold">{did}</code>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Verification ID */}
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                      <Hash className="w-4 h-4 text-slate-500" />
-                      {credentialType === "Student ID" ? "Admission Number" : "Education Govt ID"} <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={verificationID}
-                      onChange={(e) => setVerificationID(e.target.value)}
-                      placeholder={credentialType === "Student ID" ? "e.g., ADM2024001" : "e.g., EDU123456789"}
-                      required
-                      className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/20 hover:border-slate-400 transition-all"
-                    />
-                    <p className="text-xs text-slate-500 mt-2 ml-1">
-                      {credentialType === "Student ID" 
-                        ? "Your unique admission/enrollment number" 
-                        : "Government-issued education ID for verification"}
-                    </p>
+                    {/* Your Name */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                        <User className="w-4 h-4 text-slate-500" />
+                        Your Name <span className="text-xs text-slate-500 font-normal" >*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={holderName}
+                        onChange={(e) => setHolderName(e.target.value)}
+                        placeholder="Enter your full name"
+                        required
+                        className="w-full px-5 py-3 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-base placeholder-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all"
+                      />
+                    </div>
                   </div>
                 </div>
+
+                {/* Section 2: Credential Details */}
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-300 shadow-2xl">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                      <CreditCard className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800">Credential Details</h3>
+                      <p className="text-xs text-slate-500">Specify what you're requesting</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-8">
+                    {/* Credential Type */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                        <GraduationCap className="w-4 h-4 text-slate-500" />
+                        Credential Type <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={credentialType}
+                          onChange={(e) => {
+                            setCredentialType(e.target.value);
+                            setVerificationID("");
+                          }}
+                          required
+                          className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="Student ID">🎓 Student ID</option>
+                          <option value="Academic Certificate">📜 Academic Certificate</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Verification ID */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                        <Hash className="w-4 h-4 text-slate-500" />
+                        {credentialType === "Student ID" ? "Admission Number" : "Education Govt ID"} <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={verificationID}
+                        onChange={(e) => setVerificationID(e.target.value)}
+                        placeholder={credentialType === "Student ID" ? "e.g., ADM2024001" : "e.g., EDU123456789"}
+                        required
+                        className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all"
+                      />
+                      <p className="text-xs text-slate-500 mt-2 ml-1">
+                        {credentialType === "Student ID"
+                          ? "Your unique admission/enrollment number"
+                          : "Government-issued education ID for verification"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -547,7 +462,7 @@ export default function HolderRequestCredential() {
                       <BookOpen className="w-4 h-4 text-slate-500" />
                       Your Student ID Credential <span className="text-red-500">*</span>
                     </label>
-                    
+
                     {loadingVCs ? (
                       <div className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-700 flex items-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-green-500 border-t-transparent"></div>
@@ -569,7 +484,7 @@ export default function HolderRequestCredential() {
                             value={selectedStudentVC}
                             onChange={(e) => setSelectedStudentVC(e.target.value)}
                             required
-                            className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg focus:border-green-500 focus:ring-4 focus:ring-green-500/20 hover:border-slate-400 transition-all appearance-none cursor-pointer"
+                            className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all appearance-none cursor-pointer"
                           >
                             <option value="">Select a Student ID to attach</option>
                             {myStudentIDVCs.map((vc, index) => (
@@ -588,7 +503,7 @@ export default function HolderRequestCredential() {
                           <div className="w-1 h-1 bg-slate-500 rounded-full"></div>
                           Select an existing Student ID credential to link with your Academic Certificate request
                         </p>
-                        
+
                         {selectedStudentVC && (
                           <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -604,20 +519,20 @@ export default function HolderRequestCredential() {
                               return vc ? (
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                   <div>
-                                    <p className="text-green-200 text-xs mb-1">Name</p>
-                                    <p className="text-white font-semibold">{vc.credentialSubject?.name}</p>
+                                    <p className="text-slate-600 text-xs mb-1 font-semibold">Name</p>
+                                    <p className="text-slate-800 font-bold">{vc.credentialSubject?.name}</p>
                                   </div>
                                   <div>
-                                    <p className="text-green-200 text-xs mb-1">Roll Number</p>
-                                    <p className="text-white font-semibold">{vc.credentialSubject?.rollNumber}</p>
+                                    <p className="text-slate-600 text-xs mb-1 font-semibold">Roll Number</p>
+                                    <p className="text-slate-800 font-bold">{vc.credentialSubject?.rollNumber}</p>
                                   </div>
                                   <div>
-                                    <p className="text-green-200 text-xs mb-1">Department</p>
-                                    <p className="text-white font-semibold">{vc.credentialSubject?.department}</p>
+                                    <p className="text-slate-600 text-xs mb-1 font-semibold">Department</p>
+                                    <p className="text-slate-800 font-bold">{vc.credentialSubject?.department}</p>
                                   </div>
                                   <div>
-                                    <p className="text-green-200 text-xs mb-1">CID</p>
-                                    <code className="text-green-300 text-xs">{vc.cid.substring(0, 15)}...</code>
+                                    <p className="text-slate-600 text-xs mb-1 font-semibold">CID</p>
+                                    <code className="text-slate-700 text-xs font-mono font-semibold">{vc.cid.substring(0, 15)}...</code>
                                   </div>
                                 </div>
                               ) : null;
@@ -631,7 +546,7 @@ export default function HolderRequestCredential() {
               )}
 
               {/* Section 3: Request Message */}
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 lg:p-16 border-2 border-slate-300 shadow-2xl">
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-300 shadow-2xl">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
                     <MessageSquare className="w-5 h-5 text-white" />
@@ -653,7 +568,7 @@ export default function HolderRequestCredential() {
                     placeholder="E.g., I am requesting an academic certificate for my graduation in 2024. I have completed all requirements and need this for employment purposes..."
                     rows={4}
                     required
-                    className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-green-500 focus:ring-4 focus:ring-green-500/20 hover:border-slate-400 transition-all resize-none leading-relaxed"
+                    className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all resize-none leading-relaxed"
                   />
                   <p className="text-xs text-slate-500 mt-2 ml-1">
                     Provide details about what credential you need and why you're requesting it
@@ -666,23 +581,21 @@ export default function HolderRequestCredential() {
                 <motion.button
                   type="submit"
                   disabled={isSubmitting || !message.trim()}
-                  whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                  whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                  className="w-full max-w-md mx-auto block"
+                  whileHover={{ scale: isSubmitting ? 1 : 1.01 }}
+                  whileTap={{ scale: isSubmitting ? 1 : 0.99 }}
+                  className="w-full max-w-md mx-auto block bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg shadow-green-500/20 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span className="text-base">Submitting Request...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        <span className="text-base font-semibold">Submit Request & Verify DID</span>
-                      </>
-                    )}
-                  </div>
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span className="text-base">Submitting Request...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      <span className="text-base">Submit Request & Verify DID</span>
+                    </>
+                  )}
                 </motion.button>
                 <p className="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
@@ -693,101 +606,26 @@ export default function HolderRequestCredential() {
           </motion.div>
         </div>
 
-        {/* My Requests */}
+        {/* View My Requests Button */}
         <div className="w-full max-w-[1400px] mx-auto px-8 mt-8">
-          <motion.div
+          <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="glass-card p-6"
+            onClick={() => navigate("/holder/my-requests")}
+            className="w-full glass-card p-6 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all duration-300 group"
           >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center justify-between">
-              <span className="flex items-center space-x-2">
-                <Clock className="w-6 h-6 text-purple-400" />
-                <span>My Requests</span>
-              </span>
-              <span className="text-sm font-normal text-slate-400">
-                {myRequests.length} total
-              </span>
-            </h2>
-
-            {loadingRequests ? (
-              <div className="text-center py-8">
-                <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-slate-400">Loading requests...</p>
-              </div>
-            ) : myRequests.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="w-8 h-8 text-slate-600" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Clock className="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform" />
+                <div className="text-left">
+                  <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">View My Requests</h3>
+                  <p className="text-slate-400 text-sm">Track the status of your credential requests</p>
                 </div>
-                <p className="text-slate-400">No requests yet</p>
-                <p className="text-slate-500 text-sm mt-1">Submit your first request above</p>
               </div>
-            ) : (
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                {myRequests.map((request, index) => (
-                  <motion.div
-                    key={request.requestId || request.id || index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="bg-slate-800/30 border border-slate-700 rounded-xl p-4 hover:border-purple-500/30 transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="text-white font-semibold">{request.credentialType}</h3>
-                        <p className="text-xs text-slate-500 mt-1">{formatDate(request.requestedAt)}</p>
-                      </div>
-                      {getStatusBadge(request.status)}
-                    </div>
-
-                    <p className="text-slate-300 text-sm mb-3">{request.message}</p>
-
-                    {request.verificationID && (
-                      <div className="mb-3">
-                        <p className="text-xs text-slate-500 mb-1">
-                          {request.credentialType === "Student ID" ? "Admission Number:" : "Education Govt ID:"}
-                        </p>
-                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-2">
-                          <code className="text-blue-400 text-sm font-mono font-semibold">
-                            {request.verificationID}
-                          </code>
-                        </div>
-                      </div>
-                    )}
-
-                    {request.status === "approved" && request.issuedVCCID && (
-                      <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                        <p className="text-green-400 text-xs font-semibold mb-1">✅ Credential Issued</p>
-                        <code className="text-green-300 text-xs break-all">
-                          CID: {request.issuedVCCID}
-                        </code>
-                      </div>
-                    )}
-
-                    {request.status === "rejected" && request.rejectionReason && (
-                      <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                        <p className="text-red-400 text-xs font-semibold mb-1">❌ Rejected</p>
-                        <p className="text-red-300 text-xs">{request.rejectionReason}</p>
-                      </div>
-                    )}
-
-                    {/* Delete Button */}
-                    <div className="mt-3 pt-3 border-t border-slate-700">
-                      <button
-                        onClick={() => handleDeleteRequest(request.requestId || request.id)}
-                        className="w-full px-3 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        Delete Request
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </motion.div>
+              <div className="text-purple-400 text-2xl group-hover:translate-x-1 transition-transform">→</div>
+            </div>
+          </motion.button>
         </div>
       </div>
     </AnimatedPage>

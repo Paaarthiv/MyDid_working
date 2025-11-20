@@ -48,7 +48,7 @@ function HolderDashboard() {
                 navigate("/");
               }
             }}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
           >
             ← Back to Home
           </button>
@@ -60,10 +60,10 @@ function HolderDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg shadow-green-500/50 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-2xl shadow-lg shadow-purple-500/50 mb-4">
             <User className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-green-400 via-emerald-400 to-green-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(34,197,94,0.5)]">
+          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.5)]">
             Holder Dashboard
           </h1>
           <p className="text-slate-400 text-lg">Manage and access your verifiable credentials</p>
@@ -81,9 +81,9 @@ function HolderDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/holder")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-green-500/10 hover:to-emerald-500/10 hover:border-green-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-purple-500/10 hover:to-pink-500/10 hover:border-purple-500/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:shadow-green-500/50 transition-all">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
               <Shield className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">My VCs</h3>
@@ -95,9 +95,9 @@ function HolderDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/holder/request-credential")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-green-500/10 hover:to-emerald-500/10 hover:border-green-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-purple-500/10 hover:to-pink-500/10 hover:border-purple-500/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:shadow-green-500/50 transition-all">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
               <FileText className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Request Credential</h3>
@@ -109,9 +109,9 @@ function HolderDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/holder/profile")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-green-500/10 hover:to-emerald-500/10 hover:border-green-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-purple-500/10 hover:to-pink-500/10 hover:border-purple-500/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:shadow-green-500/50 transition-all">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
               <UserCircle className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">Profile</h3>
