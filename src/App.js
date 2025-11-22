@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import RoleSelection from "./components/RoleSelection";
 import IssuerLogin from "./components/IssuerLogin";
 import HolderLogin from "./components/HolderLogin";
@@ -59,7 +60,7 @@ function AppContent() {
       {!isLoginPage && <Navbar userAddress={userAddress} onLogout={logout} />}
 
       {/* Main Content */}
-      <main className={`flex-1 ${!isLoginPage ? 'pt-16' : ''}`}>
+      <main className={`flex-1 ${!isLoginPage ? 'pt-20' : ''}`}>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
             {/* Public Routes */}
@@ -236,11 +237,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

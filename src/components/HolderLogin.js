@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Wallet, User, Lock, Zap, CheckCircle, ArrowLeft } from "lucide-react";
+import { Wallet, User, Lock, Shield, CheckCircle, ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import AnimatedPage from './shared/AnimatedPage';
 
 function HolderLogin() {
   const navigate = useNavigate();
@@ -89,158 +90,159 @@ function HolderLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative background orbs - removed duplicate background gradient, AnimatedPage handles it */}
+    <AnimatedPage>
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Decorative background orbs - Navy Mirage colors */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-20 left-20 w-72 h-72 bg-navy/20 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-20 right-20 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"
+        />
 
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 left-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"
-      />
-      <motion.div
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-20 right-20 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl"
-      />
-
-      {/* Login Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10 w-full max-w-md"
-      >
-        {/* Back Button */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          whileHover={{ x: -5 }}
-          onClick={() => navigate("/")}
-          className="mb-6 flex items-center space-x-2 text-slate-400 hover:text-white transition-colors"
+        {/* Login Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="relative z-10 w-full max-w-md"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Portal Selection</span>
-        </motion.button>
-
-        <div className="glass-card text-center">
-          {/* Logo */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-2xl shadow-2xl shadow-purple-500/50 mb-6"
-          >
-            <User className="w-10 h-10 text-white" />
-          </motion.div>
-
-          {/* Title */}
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-4xl font-bold mb-3 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
-          >
-            Holder Portal
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-slate-400 mb-8"
-          >
-            Store and share your credentials securely
-          </motion.p>
-
-          {/* Features */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="grid grid-cols-3 gap-4 mb-8"
-          >
-            {[
-              { icon: Lock, label: "Private" },
-              { icon: User, label: "Personal" },
-              { icon: Zap, label: "Fast" }
-            ].map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={feature.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  className="flex flex-col items-center space-y-2 p-3 bg-purple-800/20 rounded-xl border border-purple-700/50"
-                >
-                  <Icon className="w-5 h-5 text-purple-400" />
-                  <span className="text-xs text-slate-300">{feature.label}</span>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-
-          {/* Connect Button */}
+          {/* Back Button */}
           <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.7 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={connectWallet}
-            disabled={isConnecting}
-            className="w-full bg-gradient-to-r from-[#2D1E2F] to-[#4E2A4F] hover:from-[#231823] hover:to-[#3E2240] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-purple-500/50 transition-all duration-300 flex items-center justify-center space-x-3 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            whileHover={{ x: -5 }}
+            onClick={() => navigate("/")}
+            className="mb-6 flex items-center space-x-2 text-slate-600 hover:text-navy dark:text-slate-400 dark:hover:text-white transition-colors"
           >
-            {isConnecting ? (
-              <>
-                <div className="spinner" />
-                <span>Connecting...</span>
-              </>
-            ) : (
-              <>
-                <Wallet className="w-6 h-6" />
-                <span>Connect MetaMask</span>
-              </>
-            )}
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Portal Selection</span>
           </motion.button>
 
-          {/* Info Text */}
-          <motion.p
+          <div className="glass-card text-center">
+            {/* Logo - Navy Mirage colors */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-navy-dark to-navy rounded-2xl shadow-2xl shadow-navy/50 mb-6"
+            >
+              <User className="w-10 h-10 text-white" />
+            </motion.div>
+
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-4xl font-bold mb-3 bg-gradient-to-r from-navy-dark to-navy dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent"
+            >
+              Holder Portal
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-slate-600 dark:text-slate-400 mb-8"
+            >
+              Manage your digital identity wallet
+            </motion.p>
+
+            {/* Features - Navy Mirage colors */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="grid grid-cols-3 gap-4 mb-8"
+            >
+              {[
+                { icon: User, label: "Identity" },
+                { icon: Lock, label: "Private" },
+                { icon: Shield, label: "Secure" }
+              ].map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.div
+                    key={feature.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    className="flex flex-col items-center space-y-2 p-3 bg-navy/5 dark:bg-navy/20 rounded-xl border border-navy/10 dark:border-navy/50"
+                  >
+                    <Icon className="w-5 h-5 text-navy dark:text-blue-300" />
+                    <span className="text-xs text-slate-600 dark:text-slate-300">{feature.label}</span>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+
+            {/* Connect Button - Navy Mirage colors */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.7 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={connectWallet}
+              disabled={isConnecting}
+              className="w-full bg-gradient-to-r from-navy-dark to-navy hover:from-navy-darker hover:to-navy-medium text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-navy/50 transition-all duration-300 flex items-center justify-center space-x-3 text-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isConnecting ? (
+                <>
+                  <div className="spinner" />
+                  <span>Connecting...</span>
+                </>
+              ) : (
+                <>
+                  <Wallet className="w-6 h-6" />
+                  <span>Connect MetaMask</span>
+                </>
+              )}
+            </motion.button>
+
+            {/* Info Text */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="mt-6 text-sm text-slate-500"
+            >
+              Don't have MetaMask?{' '}
+              <a
+                href="https://metamask.io/download.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 transition-colors underline"
+              >
+                Install it here
+              </a>
+            </motion.p>
+          </div>
+
+          {/* Trust Indicators */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-6 text-sm text-slate-500"
+            transition={{ delay: 0.9 }}
+            className="mt-6 flex items-center justify-center space-x-6 text-sm text-slate-400"
           >
-            Don't have MetaMask?{' '}
-            <a
-              href="https://metamask.io/download.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-purple-400 hover:text-purple-300 transition-colors underline"
-            >
-              Install it here
-            </a>
-          </motion.p>
-        </div>
-
-        {/* Trust Indicators */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="mt-6 flex items-center justify-center space-x-6 text-sm text-slate-400"
-        >
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="w-4 h-4 text-pink-400" />
-            <span>Zero-Knowledge Proofs</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="w-4 h-4 text-pink-400" />
-            <span>Selective Disclosure</span>
-          </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span>Blockchain Secured</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span>BBS+ Signatures</span>
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
-    </div>
+      </div>
+    </AnimatedPage>
   );
 }
 

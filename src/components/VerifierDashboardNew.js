@@ -128,32 +128,16 @@ export default function VerifierDashboard() {
         <div className="mb-8 animate-fadeIn">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(16,185,129,0.5)]">
+              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
                 Verify Credential
               </h1>
-              <p className="text-slate-400 text-lg">
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
                 Upload QR code or enter CID to verify a credential
               </p>
             </div>
             <button
               onClick={() => navigate("/verifier/history")}
-              style={{
-                padding: '12px 24px',
-                background: 'rgba(255,255,255,0.2)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: 'var(--radius-md)',
-                color: 'white',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all var(--transition-fast)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
-              onMouseOut={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+              className="px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 rounded-xl text-gray-900 dark:text-white font-semibold transition-all flex items-center gap-2"
             >
               📜 View History
             </button>
@@ -168,12 +152,7 @@ export default function VerifierDashboard() {
             <div>
               {/* QR Upload */}
               <div style={{ marginBottom: '24px' }}>
-                <h3 style={{
-                  fontSize: 'var(--font-size-lg)',
-                  fontWeight: '600',
-                  marginBottom: '16px',
-                  color: 'white'
-                }}>
+                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                   📷 Upload QR Code
                 </h3>
                 <QRUploadZone
@@ -196,29 +175,13 @@ export default function VerifierDashboard() {
               </div>
 
               {/* Manual Input */}
-              <div style={{
-                background: 'white',
-                padding: '24px',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: 'var(--shadow-md)'
-              }}>
-                <h3 style={{
-                  fontSize: 'var(--font-size-lg)',
-                  fontWeight: '600',
-                  marginBottom: '16px',
-                  color: 'var(--color-text-primary)'
-                }}>
+              <div className="bg-white dark:bg-slate-800/50 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                   ✍️ Or Enter Manually
                 </h3>
 
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: '600',
-                    color: 'var(--color-text-secondary)',
-                    marginBottom: '8px'
-                  }}>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                     IPFS CID *
                   </label>
                   <input
@@ -226,28 +189,12 @@ export default function VerifierDashboard() {
                     value={cid}
                     onChange={(e) => setCid(e.target.value)}
                     placeholder="QmXyz..."
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: 'var(--font-size-sm)',
-                      fontFamily: 'monospace',
-                      transition: 'all var(--transition-fast)'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--color-student-id-start)'}
-                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-mono focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 dark:text-white"
                   />
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: '600',
-                    color: 'var(--color-text-secondary)',
-                    marginBottom: '8px'
-                  }}>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
                     BBS+ Public Key (Optional)
                   </label>
                   <input
@@ -255,93 +202,36 @@ export default function VerifierDashboard() {
                     value={publicKey}
                     onChange={(e) => setPublicKey(e.target.value)}
                     placeholder="Base64 encoded public key..."
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: 'var(--font-size-sm)',
-                      fontFamily: 'monospace',
-                      transition: 'all var(--transition-fast)'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--color-student-id-start)'}
-                    onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-mono focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 dark:text-white"
                   />
                 </div>
 
                 {/* Save to History Toggle */}
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  marginBottom: '20px',
-                  cursor: 'pointer',
-                  fontSize: 'var(--font-size-sm)',
-                  color: 'var(--color-text-secondary)'
-                }}>
+                <label className="flex items-center gap-2 mb-5 cursor-pointer text-sm text-slate-600 dark:text-slate-400">
                   <input
                     type="checkbox"
                     checked={saveToHistory}
                     onChange={(e) => setSaveToHistory(e.target.checked)}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                   />
                   <span>Save successful verifications to history</span>
                 </label>
 
                 {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div className="flex gap-3">
                   <button
                     onClick={() => verify()}
                     disabled={loading || !cid.trim()}
-                    style={{
-                      flex: 1,
-                      padding: '14px',
-                      background: loading || !cid.trim()
-                        ? 'var(--color-border)'
-                        : 'linear-gradient(135deg, #0F2027 0%, #28623A 100%)',
-                      border: 'none',
-                      borderRadius: 'var(--radius-sm)',
-                      color: 'white',
-                      fontSize: 'var(--font-size-base)',
-                      fontWeight: '600',
-                      cursor: loading || !cid.trim() ? 'not-allowed' : 'pointer',
-                      transition: 'all var(--transition-fast)',
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                    onMouseOver={(e) => {
-                      if (!loading && cid.trim()) {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = 'var(--shadow-md)';
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = 'var(--shadow-sm)';
-                    }}
+                    className={`flex-1 py-3.5 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2 ${loading || !cid.trim()
+                        ? "bg-slate-300 dark:bg-slate-700 cursor-not-allowed"
+                        : "bg-gradient-to-r from-navy-dark to-navy hover:shadow-lg hover:-translate-y-0.5"
+                      }`}
                   >
                     {loading ? '🔄 Verifying...' : '✓ Verify Credential'}
                   </button>
                   <button
                     onClick={handleReset}
-                    style={{
-                      padding: '14px 20px',
-                      background: 'transparent',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      color: 'var(--color-text-secondary)',
-                      fontSize: 'var(--font-size-base)',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all var(--transition-fast)'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(0,0,0,0.02)';
-                      e.target.style.color = 'var(--color-text-primary)';
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = 'transparent';
-                      e.target.style.color = 'var(--color-text-secondary)';
-                    }}
+                    className="px-6 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                   >
                     Reset
                   </button>

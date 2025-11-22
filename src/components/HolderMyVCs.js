@@ -225,13 +225,13 @@ export default function HolderMyVCs() {
     <AnimatedPage className="min-h-screen py-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 animate-fadeIn">
+        <div className="mb-8 animate-fadeIn mt-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.5)]">
+              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 text-gray-900 dark:text-white drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
                 My Credentials
               </h1>
-              <p className="text-gray-600">View and manage credentials you've received</p>
+              <p className="text-gray-600 dark:text-slate-300">View and manage credentials you've received</p>
             </div>
             <button
               onClick={() => {
@@ -240,7 +240,7 @@ export default function HolderMyVCs() {
                   navigate("/");
                 }
               }}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-300 flex items-center gap-2 hover:shadow-lg"
+              className="px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-medium transition-all duration-300 flex items-center gap-2 hover:shadow-lg"
             >
               ← Back to Home
             </button>
@@ -251,30 +251,30 @@ export default function HolderMyVCs() {
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-[#2D1E2F] to-[#4E2A4F] rounded-xl shadow-lg p-6 text-white">
+            <div className="bg-gradient-to-br from-navy-dark to-navy rounded-xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm mb-1">Total Credentials</p>
+                  <p className="text-blue-100 text-sm mb-1">Total Credentials</p>
                   <p className="text-4xl font-bold">{stats.totalCredentials}</p>
                 </div>
                 <div className="text-5xl opacity-50">📚</div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-[#3D2A3F] to-[#5E3A5F] rounded-xl shadow-lg p-6 text-white">
+            <div className="bg-gradient-to-br from-slate-800 to-navy-light rounded-xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm mb-1">Verified</p>
+                  <p className="text-blue-100 text-sm mb-1">Verified</p>
                   <p className="text-4xl font-bold">{stats.totalCredentials}</p>
                 </div>
                 <div className="text-5xl opacity-50">✅</div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-[#4E2A4F] to-[#6E3A6F] rounded-xl shadow-lg p-6 text-white">
+            <div className="bg-gradient-to-br from-navy-accent to-navy rounded-xl shadow-lg p-6 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm mb-1">Latest Issue</p>
+                  <p className="text-blue-100 text-sm mb-1">Latest Issue</p>
                   <p className="text-sm font-semibold">
                     {stats.latestIssuance
                       ? formatDate(stats.latestIssuance).split(",")[0]
@@ -290,18 +290,18 @@ export default function HolderMyVCs() {
         {/* Credentials Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">My Credentials</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Credentials</h2>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
+                className="px-4 py-2 bg-gradient-to-r from-navy-dark to-navy text-white rounded-lg hover:from-navy-darker hover:to-navy-medium transition-all duration-300 flex items-center gap-2 font-medium shadow-md hover:shadow-lg"
               >
                 <span>➕</span> Add from CID
               </button>
               <button
                 onClick={fetchCredentials}
                 disabled={loading}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-medium transition flex items-center gap-2 disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -320,7 +320,7 @@ export default function HolderMyVCs() {
           {/* Loading State */}
           {loading && credentials.length === 0 && (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-navy mx-auto mb-4"></div>
               <p className="text-gray-600">Loading your credentials...</p>
             </div>
           )}
@@ -340,7 +340,7 @@ export default function HolderMyVCs() {
 
           {/* Empty State */}
           {!loading && !error && credentials.length === 0 && (
-            <div className="bg-gradient-to-r from-purple-50 to-white border-2 border-dashed border-purple-300 rounded-xl p-12 text-center shadow-lg">
+            <div className="bg-gradient-to-r from-blue-50 to-white border-2 border-dashed border-blue-300 rounded-xl p-12 text-center shadow-lg">
               <div className="text-6xl mb-4 animate-bounce">📭</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-2">
                 No Credentials Received Yet
@@ -366,10 +366,10 @@ export default function HolderMyVCs() {
                 return (
                   <div
                     key={vcCID || index}
-                    className="credential-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-purple-300 transform hover:-translate-y-2"
+                    className="credential-card bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:border-blue-300 dark:hover:border-blue-500 transform hover:-translate-y-2"
                   >
                     {/* Card Header */}
-                    <div className="bg-gradient-to-r from-[#2D1E2F] to-[#4E2A4F] p-4 text-white">
+                    <div className="bg-gradient-to-r from-navy-dark to-navy p-4 text-white">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <span className="text-3xl">
@@ -379,7 +379,7 @@ export default function HolderMyVCs() {
                             <h3 className="font-bold text-lg">
                               {documentType}
                             </h3>
-                            <p className="text-sm text-purple-100">
+                            <p className="text-sm text-blue-100">
                               {vc.credentialType || "VerifiableCredential"}
                             </p>
                           </div>
@@ -391,62 +391,62 @@ export default function HolderMyVCs() {
                     <div className="p-6">
                       <div className="space-y-3 mb-4">
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Name</p>
-                          <p className="font-semibold text-gray-800">{subject.name || "N/A"}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Name</p>
+                          <p className="font-semibold text-gray-800 dark:text-white">{subject.name || "N/A"}</p>
                         </div>
 
                         {/* Conditional rendering based on credential type */}
                         {vc.credentialType === "AcademicCertificate" ? (
                           <>
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Register Number</p>
-                              <p className="font-mono text-sm text-gray-700">{subject.registerNumber || "N/A"}</p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Register Number</p>
+                              <p className="font-mono text-sm text-gray-700 dark:text-slate-300">{subject.registerNumber || "N/A"}</p>
                             </div>
 
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Degree</p>
-                              <p className="text-sm text-gray-700">{subject.degree || "N/A"}</p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Degree</p>
+                              <p className="text-sm text-gray-700 dark:text-slate-300">{subject.degree || "N/A"}</p>
                             </div>
 
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Branch</p>
-                              <p className="text-sm text-gray-700">{subject.branch || "N/A"}</p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Branch</p>
+                              <p className="text-sm text-gray-700 dark:text-slate-300">{subject.branch || "N/A"}</p>
                             </div>
 
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">University</p>
-                              <p className="text-sm text-gray-700">{subject.university || "N/A"}</p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">University</p>
+                              <p className="text-sm text-gray-700 dark:text-slate-300">{subject.university || "N/A"}</p>
                             </div>
                           </>
                         ) : (
                           <>
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Roll Number</p>
-                              <p className="font-mono text-sm text-gray-700">{subject.rollNumber || "N/A"}</p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Roll Number</p>
+                              <p className="font-mono text-sm text-gray-700 dark:text-slate-300">{subject.rollNumber || "N/A"}</p>
                             </div>
 
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">Department</p>
-                              <p className="text-sm text-gray-700">{subject.department || "N/A"}</p>
+                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Department</p>
+                              <p className="text-sm text-gray-700 dark:text-slate-300">{subject.department || "N/A"}</p>
                             </div>
                           </>
                         )}
 
                         <div className="pt-3 border-t border-gray-200">
-                          <p className="text-xs text-gray-500 mb-1">Issued Date</p>
-                          <p className="text-sm text-gray-700">{formatDate(vc.issuanceDate)}</p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Issued Date</p>
+                          <p className="text-sm text-gray-700 dark:text-slate-300">{formatDate(vc.issuanceDate)}</p>
                         </div>
 
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Issuer DID</p>
-                          <p className="font-mono text-xs text-purple-600 break-all">
+                          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Issuer DID</p>
+                          <p className="font-mono text-xs text-blue-600 break-all">
                             {vc.issuerDID ? vc.issuerDID.substring(0, 30) + "..." : "N/A"}
                           </p>
                         </div>
 
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">IPFS CID</p>
-                          <p className="font-mono text-xs text-gray-600 break-all">
+                          <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">IPFS CID</p>
+                          <p className="font-mono text-xs text-gray-600 dark:text-slate-400 break-all">
                             {vcCID ? vcCID.substring(0, 20) + "..." : "N/A"}
                           </p>
                         </div>
@@ -456,21 +456,21 @@ export default function HolderMyVCs() {
                       <div className="space-y-2">
                         <button
                           onClick={() => handleViewCredential(vcCID)}
-                          className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-300 flex items-center justify-center gap-2 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
+                          className="w-full px-4 py-2 bg-navy text-white rounded-lg hover:bg-navy-medium transition-all duration-300 flex items-center justify-center gap-2 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
                         >
                           <span></span> View Credential
                         </button>
 
                         <button
                           onClick={() => handleGenerateProof(vc)}
-                          className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-2 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
+                          className="w-full px-4 py-2 bg-gradient-to-r from-navy-dark to-navy text-white rounded-lg hover:from-navy-darker hover:to-navy-medium transition-all duration-300 flex items-center justify-center gap-2 font-medium hover:shadow-lg transform hover:-translate-y-0.5"
                         >
                           <span></span> Selective Disclosure
                         </button>
 
                         <button
                           onClick={() => handleRemoveCredential(vcCID)}
-                          className="w-full px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                          className="w-full px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
                         >
                           <span></span> Remove
                         </button>
@@ -484,11 +484,11 @@ export default function HolderMyVCs() {
         </div>
 
         {/* Info Section */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-md">
-          <h3 className="font-bold text-purple-900 mb-3 flex items-center gap-2 text-lg">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-md">
+          <h3 className="font-bold text-blue-900 mb-3 flex items-center gap-2 text-lg">
             <span>ℹ️</span> About Your Credential Dashboard
           </h3>
-          <ul className="text-sm text-purple-800 space-y-2">
+          <ul className="text-sm text-blue-800 space-y-2">
             <li className="flex items-start gap-2">
               <span className="text-green-600 mt-0.5">✓</span>
               <span><strong>Receive:</strong> Credentials issued to your wallet appear here automatically</span>

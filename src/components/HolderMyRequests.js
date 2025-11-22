@@ -104,8 +104,8 @@ export default function HolderMyRequests() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    <h1 className="text-4xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.5)]">My Requests</h1>
-                    <p className="text-slate-400">Track your credential requests and their status</p>
+                    <h1 className="text-4xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">My Requests</h1>
+                    <p className="text-slate-600 dark:text-slate-400">Track your credential requests and their status</p>
                 </motion.div>
 
                 {/* Back Button */}
@@ -117,7 +117,7 @@ export default function HolderMyRequests() {
                 >
                     <button
                         onClick={() => navigate("/holder/request-credential")}
-                        className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
+                        className="px-6 py-3 bg-navy hover:bg-navy-medium text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
                     >
                         ← Back to Request Credential
                     </button>
@@ -130,9 +130,9 @@ export default function HolderMyRequests() {
                     transition={{ delay: 0.2 }}
                     className="glass-card p-6"
                 >
-                    <h2 className="text-2xl font-bold text-white mb-6 flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center justify-between">
                         <span className="flex items-center space-x-2">
-                            <Clock className="w-6 h-6 text-purple-400" />
+                            <Clock className="w-6 h-6 text-blue-400" />
                             <span>All Requests</span>
                         </span>
                         <span className="text-sm font-normal text-slate-400">
@@ -142,7 +142,7 @@ export default function HolderMyRequests() {
 
                     {loadingRequests ? (
                         <div className="text-center py-8">
-                            <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                            <div className="w-12 h-12 border-4 border-navy border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                             <p className="text-slate-400">Loading requests...</p>
                         </div>
                     ) : myRequests.length === 0 ? (
@@ -161,25 +161,25 @@ export default function HolderMyRequests() {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
-                                    className="bg-slate-800/30 border border-slate-700 rounded-xl p-4 hover:border-purple-500/30 transition-all"
+                                    className="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:border-navy/30 transition-all shadow-sm dark:shadow-none"
                                 >
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h3 className="text-white font-semibold">{request.credentialType}</h3>
+                                            <h3 className="text-gray-900 dark:text-white font-semibold">{request.credentialType}</h3>
                                             <p className="text-xs text-slate-500 mt-1">{formatDate(request.requestedAt)}</p>
                                         </div>
                                         {getStatusBadge(request.status)}
                                     </div>
 
-                                    <p className="text-slate-300 text-sm mb-3">{request.message}</p>
+                                    <p className="text-slate-600 dark:text-slate-300 text-sm mb-3">{request.message}</p>
 
                                     {request.verificationID && (
                                         <div className="mb-3">
                                             <p className="text-xs text-slate-500 mb-1">
                                                 {request.credentialType === "Student ID" ? "Admission Number:" : "Education Govt ID:"}
                                             </p>
-                                            <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg px-3 py-2">
-                                                <code className="text-purple-400 text-sm font-mono font-semibold">
+                                            <div className="bg-navy/10 border border-navy/30 rounded-lg px-3 py-2">
+                                                <code className="text-blue-400 text-sm font-mono font-semibold">
                                                     {request.verificationID}
                                                 </code>
                                             </div>

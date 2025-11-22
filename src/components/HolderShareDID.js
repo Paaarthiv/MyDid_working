@@ -66,7 +66,7 @@ export default function HolderShareDID() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-2 border-green-200"
+      className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl shadow-lg p-6 border-2 border-green-200 dark:border-green-800"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
@@ -74,26 +74,26 @@ export default function HolderShareDID() {
             <Share2 className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-800">Share Your DID</h3>
-            <p className="text-sm text-gray-600">Allow issuers to send credentials directly to you</p>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white">Share Your DID</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Allow issuers to send credentials directly to you</p>
           </div>
         </div>
-        
+
         {isShared && (
-          <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 rounded-full border border-green-300">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-semibold text-green-700">Shared</span>
+          <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 dark:bg-green-900/50 rounded-full border border-green-300 dark:border-green-700">
+            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <span className="text-sm font-semibold text-green-700 dark:text-green-300">Shared</span>
           </div>
         )}
       </div>
 
       {/* DID Display */}
-      <div className="bg-white rounded-lg p-4 mb-4 border border-green-200">
+      <div className="bg-white dark:bg-slate-800 rounded-lg p-4 mb-4 border border-green-200 dark:border-green-800">
         <div className="flex items-center space-x-2 mb-2">
-          <Shield className="w-4 h-4 text-green-600" />
-          <span className="text-sm font-semibold text-gray-700">Your DID:</span>
+          <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Your DID:</span>
         </div>
-        <p className="font-mono text-sm text-gray-800 break-all bg-gray-50 p-2 rounded">
+        <p className="font-mono text-sm text-gray-800 dark:text-gray-200 break-all bg-gray-50 dark:bg-slate-900 p-2 rounded">
           {did}
         </p>
       </div>
@@ -105,7 +105,7 @@ export default function HolderShareDID() {
           animate={{ opacity: 1, height: "auto" }}
           className="mb-4"
         >
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
             <User className="w-4 h-4 inline mr-1" />
             Your Name (Optional)
           </label>
@@ -114,10 +114,9 @@ export default function HolderShareDID() {
             value={holderName}
             onChange={(e) => setHolderName(e.target.value)}
             placeholder="Enter your name for issuers to identify you"
-            className="w-full px-4 py-3 border-2 border-green-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all"
-            style={{ color: '#000', fontWeight: '600' }}
+            className="w-full px-4 py-3 border-2 border-green-300 dark:border-green-700 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:bg-slate-800 dark:text-white transition-all font-semibold"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             This helps issuers identify you when issuing credentials
           </p>
         </motion.div>
@@ -161,20 +160,20 @@ export default function HolderShareDID() {
           <div className="flex items-center space-x-3">
             <CheckCircle className="w-6 h-6 text-green-600" />
             <div>
-              <p className="font-bold text-green-800">DID Shared Successfully!</p>
-              <p className="text-sm text-green-700">
+              <p className="font-bold text-green-800 dark:text-green-300">DID Shared Successfully!</p>
+              <p className="text-sm text-green-700 dark:text-green-400">
                 Issuers can now send verifiable credentials directly to your DID
               </p>
             </div>
           </div>
-          
+
           {/* Update Button */}
           <button
             onClick={() => {
               setIsShared(false);
               setShowNameInput(true);
             }}
-            className="mt-3 w-full px-4 py-2 bg-white hover:bg-gray-50 text-green-700 font-semibold rounded-lg border border-green-300 transition-all"
+            className="mt-3 w-full px-4 py-2 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-green-700 dark:text-green-400 font-semibold rounded-lg border border-green-300 dark:border-green-700 transition-all"
           >
             Update Information
           </button>
@@ -182,10 +181,10 @@ export default function HolderShareDID() {
       )}
 
       {/* Info Box */}
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-xs text-blue-800">
+      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <p className="text-xs text-blue-800 dark:text-blue-300">
           <strong>ℹ️ Why share your DID?</strong><br />
-          When you share your DID, issuers can select you from their list and issue credentials directly to you. 
+          When you share your DID, issuers can select you from their list and issue credentials directly to you.
           You'll automatically receive these credentials in your wallet.
         </p>
       </div>

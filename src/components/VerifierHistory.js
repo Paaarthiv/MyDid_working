@@ -86,10 +86,10 @@ export default function VerifierHistory() {
         <div className="mb-8 animate-fadeIn">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(16,185,129,0.5)]">
+              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
                 Verification History
               </h1>
-              <p className="text-slate-400 text-lg">
+              <p className="text-slate-600 dark:text-slate-400 text-lg">
                 {history.length} verification{history.length !== 1 ? 's' : ''} recorded locally
               </p>
             </div>
@@ -116,15 +116,15 @@ export default function VerifierHistory() {
         <div className="w-full">
           {history.length === 0 ? (
             // Empty State
-            <div className="bg-white rounded-xl shadow-lg p-12 text-center max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-12 text-center max-w-2xl mx-auto">
               <div className="text-6xl mb-4">📭</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">No Verification History</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">No Verification History</h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Verified credentials will appear here. Start verifying credentials to build your history.
               </p>
               <button
                 onClick={() => navigate("/verifier-dashboard")}
-                className="px-6 py-3 bg-gradient-to-r from-[#0F2027] to-[#28623A] text-white rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                className="px-6 py-3 bg-gradient-to-r from-navy-dark to-navy text-white rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
               >
                 Verify a Credential
               </button>
@@ -234,11 +234,11 @@ export default function VerifierHistory() {
               className="fixed inset-0 bg-black/50 z-[1001] backdrop-blur-sm"
               onClick={() => setShowClearConfirm(false)}
             />
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl p-8 max-w-md w-[90%] shadow-2xl z-[1002] animate-scaleIn">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-800 rounded-xl p-8 max-w-md w-[90%] shadow-2xl z-[1002] animate-scaleIn">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
                 Clear All History?
               </h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
                 This will permanently delete all {history.length} verification records from your local history.
                 <br /><br />
                 <strong>Note:</strong> This only affects your local view. Credentials on blockchain/IPFS are not affected.
@@ -246,7 +246,7 @@ export default function VerifierHistory() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 py-3 bg-transparent border border-gray-300 rounded-lg text-gray-600 font-semibold hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 bg-transparent border border-gray-300 dark:border-slate-600 rounded-lg text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancel
                 </button>
@@ -268,8 +268,8 @@ export default function VerifierHistory() {
 // Helper component for detail rows
 function DetailRow({ label, value, mono = false, valueColor = 'var(--color-text-primary)' }) {
   return (
-    <div className="flex flex-col gap-1 p-3 bg-gray-50 rounded-lg border border-gray-100">
-      <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+    <div className="flex flex-col gap-1 p-3 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-800">
+      <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">
         {label}
       </div>
       <div

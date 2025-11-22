@@ -7,7 +7,7 @@ import "../styles/animations.css";
 export default function SelectiveDisclosure() {
   const { cid } = useParams();
   const navigate = useNavigate();
-  
+
   const [vc, setVc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ export default function SelectiveDisclosure() {
       if (!vcData || !vcData.vc) {
         console.log("Fetching VC from IPFS...");
         const response = await axios.get(`http://localhost:5000/fetchVC/${cid}`);
-        
+
         if (response.data.success) {
           vcData = {
             cid: cid,
@@ -46,7 +46,7 @@ export default function SelectiveDisclosure() {
       setVc(vcData.vc);
       console.log("VC loaded:", vcData.vc);
       console.log("Proof object:", vcData.vc?.proof);
-      
+
       if (!vcData.vc?.proof) {
         console.error("❌ VC is missing proof object!");
         console.log("Full VC:", JSON.stringify(vcData.vc, null, 2));
@@ -67,7 +67,7 @@ export default function SelectiveDisclosure() {
   };
 
   const isAcademicCertificate = vc?.type?.includes("AcademicCertificate");
-  
+
   const availableFields = vc ? (
     isAcademicCertificate ? [
       // Academic Certificate fields
@@ -139,7 +139,7 @@ export default function SelectiveDisclosure() {
         selectedFields: selectedFields,
         hasPublicKey: !!publicKey
       });
-      
+
       const response = await axios.post("http://localhost:5000/generateProof", {
         vc: vc,
         selectedFields: selectedFields,
@@ -206,16 +206,16 @@ export default function SelectiveDisclosure() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#141E30] p-8 transition-colors duration-300">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fadeIn">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 🔐 Selective Disclosure
               </h1>
-              <p className="text-gray-800 font-semibold">Choose which attributes to share</p>
+              <p className="text-gray-600 dark:text-slate-300 font-semibold">Choose which attributes to share</p>
             </div>
             <button
               onClick={() => navigate("/holder")}
@@ -227,11 +227,11 @@ export default function SelectiveDisclosure() {
         </div>
 
         {/* Instructions */}
-        <div className="bg-blue-100 border-2 border-blue-400 rounded-lg p-6 mb-6 animate-slideIn">
-          <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800/50 border border-indigo-200 dark:border-indigo-500/30 rounded-lg p-6 mb-6 animate-slideIn shadow-sm dark:shadow-none">
+          <h3 className="font-bold text-indigo-600 dark:text-indigo-300 mb-2 flex items-center gap-2">
             <span>💡</span> How It Works
           </h3>
-          <ul className="text-sm text-gray-900 font-semibold space-y-1 list-disc list-inside">
+          <ul className="text-sm text-gray-600 dark:text-slate-300 font-semibold space-y-1 list-disc list-inside">
             <li>Select only the attributes you want to share</li>
             <li>A cryptographic proof will be generated using BBS+ signatures</li>
             <li>The verifier can confirm these attributes without seeing the full credential</li>
@@ -240,19 +240,19 @@ export default function SelectiveDisclosure() {
         </div>
 
         {/* Field Selection */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6 animate-scaleIn border-2 border-gray-300">
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl shadow-lg p-8 mb-6 animate-scaleIn border border-gray-200 dark:border-slate-700">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-black">Select Fields to Disclose</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Select Fields to Disclose</h2>
             <div className="flex gap-2">
               <button
                 onClick={handleSelectAll}
-                className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition text-sm font-medium"
+                className="px-4 py-2 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition text-sm font-medium border border-indigo-200 dark:border-indigo-500/30"
               >
                 Select All
               </button>
               <button
                 onClick={handleDeselectAll}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                className="px-4 py-2 bg-gray-100 dark:bg-slate-700/50 text-gray-600 dark:text-slate-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition text-sm font-medium border border-gray-200 dark:border-slate-600"
               >
                 Deselect All
               </button>
@@ -263,23 +263,22 @@ export default function SelectiveDisclosure() {
             {availableFields.map((field) => (
               <label
                 key={field.key}
-                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ${
-                  selectedFields.includes(field.key)
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
-                }`}
+                className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all duration-300 ${selectedFields.includes(field.key)
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/20'
+                  : 'border-gray-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                  }`}
               >
                 <input
                   type="checkbox"
                   checked={selectedFields.includes(field.key)}
                   onChange={() => handleFieldToggle(field.key)}
-                  className="mt-1 w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                  className="mt-1 w-5 h-5 text-indigo-600 dark:text-indigo-500 rounded focus:ring-indigo-500 bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600"
                 />
                 <div className="flex-1">
-                  <p className="font-bold text-black">{field.label}</p>
-                  <p className="text-sm text-gray-900 font-semibold break-all mt-1">
-                    {field.value.length > 60 
-                      ? field.value.substring(0, 60) + "..." 
+                  <p className="font-bold text-gray-900 dark:text-slate-200">{field.label}</p>
+                  <p className="text-sm text-gray-600 dark:text-slate-400 font-semibold break-all mt-1">
+                    {field.value.length > 60
+                      ? field.value.substring(0, 60) + "..."
                       : field.value}
                   </p>
                 </div>
@@ -288,10 +287,10 @@ export default function SelectiveDisclosure() {
           </div>
 
           {/* Selected Count */}
-          <div className="mt-6 p-4 bg-purple-100 rounded-lg border-2 border-purple-300">
-            <p className="text-center text-black font-bold text-lg">
-              <span className="text-purple-700">{selectedFields.length}</span> of{" "}
-              <span className="text-gray-900">{availableFields.length}</span> fields selected
+          <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg border border-indigo-200 dark:border-indigo-500/30">
+            <p className="text-center text-gray-700 dark:text-slate-300 font-bold text-lg">
+              <span className="text-indigo-600 dark:text-indigo-400">{selectedFields.length}</span> of{" "}
+              <span className="text-gray-500 dark:text-slate-400">{availableFields.length}</span> fields selected
             </p>
           </div>
         </div>
@@ -308,7 +307,7 @@ export default function SelectiveDisclosure() {
           <button
             onClick={handleGenerateProof}
             disabled={generating || selectedFields.length === 0}
-            className="flex-1 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="flex-1 px-8 py-4 bg-gradient-to-r from-navy-dark to-navy text-white rounded-lg hover:from-navy hover:to-navy-light transition-all duration-300 font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             {generating ? (
               <>
@@ -325,9 +324,9 @@ export default function SelectiveDisclosure() {
 
         {/* Success Modal */}
         {showModal && proofResult && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fadeIn">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn">
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white rounded-t-2xl">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scaleIn border border-gray-200 dark:border-slate-700">
+              <div className="bg-gradient-to-r from-navy-dark to-navy p-6 text-white rounded-t-2xl">
                 <h2 className="text-2xl font-bold flex items-center gap-3">
                   <span>✅</span> Proof Generated Successfully!
                 </h2>
@@ -336,21 +335,21 @@ export default function SelectiveDisclosure() {
               <div className="p-8">
                 {/* QR Code */}
                 <div className="text-center mb-6">
-                  <p className="text-gray-700 mb-4 font-semibold">Scan this QR code to share your proof:</p>
-                  <div className="inline-block p-4 bg-white rounded-lg shadow-lg border-4 border-purple-200">
-                    <img 
-                      src={proofResult.qrCode} 
-                      alt="Proof QR Code" 
+                  <p className="text-gray-600 dark:text-slate-300 mb-4 font-semibold">Scan this QR code to share your proof:</p>
+                  <div className="inline-block p-4 bg-white rounded-lg shadow-lg border-4 border-indigo-100 dark:border-indigo-500/30">
+                    <img
+                      src={proofResult.qrCode}
+                      alt="Proof QR Code"
                       className="w-64 h-64"
                     />
                   </div>
                 </div>
 
                 {/* Proof CID */}
-                <div className="bg-gray-100 rounded-lg p-4 mb-6 border-2 border-gray-300">
-                  <p className="text-sm text-gray-800 mb-2 font-bold">Proof IPFS CID:</p>
+                <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 mb-6 border border-gray-200 dark:border-slate-700">
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">Proof IPFS CID:</p>
                   <div className="flex items-center gap-2">
-                    <p className="font-mono text-sm text-black break-all flex-1 font-semibold">
+                    <p className="font-mono text-sm text-gray-900 dark:text-slate-300 break-all flex-1 font-semibold">
                       {proofResult.proofCid}
                     </p>
                     <button
@@ -363,13 +362,13 @@ export default function SelectiveDisclosure() {
                 </div>
 
                 {/* Disclosed Fields */}
-                <div className="bg-purple-100 rounded-lg p-4 mb-6 border-2 border-purple-300">
-                  <p className="text-sm text-purple-900 font-bold mb-2">Disclosed Fields:</p>
+                <div className="bg-indigo-50 dark:bg-indigo-500/10 rounded-lg p-4 mb-6 border border-indigo-200 dark:border-indigo-500/30">
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300 font-bold mb-2">Disclosed Fields:</p>
                   <div className="flex flex-wrap gap-2">
                     {proofResult.selectedFields.map(field => (
-                      <span 
+                      <span
                         key={field}
-                        className="px-3 py-1 bg-purple-200 text-purple-800 rounded-full text-sm font-medium"
+                        className="px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium border border-indigo-200 dark:border-indigo-500/30"
                       >
                         {field}
                       </span>
@@ -378,13 +377,13 @@ export default function SelectiveDisclosure() {
                 </div>
 
                 {/* Disclosed Data */}
-                <div className="bg-green-100 rounded-lg p-4 mb-6 border-2 border-green-300">
-                  <p className="text-sm text-green-900 font-bold mb-2">Disclosed Data:</p>
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 rounded-lg p-4 mb-6 border border-emerald-200 dark:border-emerald-500/30">
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400 font-bold mb-2">Disclosed Data:</p>
                   <div className="space-y-2">
                     {Object.entries(proofResult.disclosedData || {}).map(([key, value]) => (
                       <div key={key} className="flex gap-2">
-                        <span className="font-bold text-black">{key}:</span>
-                        <span className="text-gray-900 font-semibold break-all">{value}</span>
+                        <span className="font-bold text-gray-900 dark:text-slate-200">{key}:</span>
+                        <span className="text-gray-600 dark:text-slate-400 font-semibold break-all">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -394,13 +393,13 @@ export default function SelectiveDisclosure() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleDownloadQR}
-                    className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-navy-dark to-navy text-white rounded-lg hover:from-navy hover:to-navy-light transition font-medium"
                   >
                     📥 Download QR Code
                   </button>
                   <button
                     onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${proofResult.proofCid}`, "_blank")}
-                    className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                    className="flex-1 px-6 py-3 bg-emerald-700 text-white rounded-lg hover:bg-emerald-600 transition font-medium"
                   >
                     🌐 View on IPFS
                   </button>
@@ -409,7 +408,7 @@ export default function SelectiveDisclosure() {
                       setShowModal(false);
                       navigate("/holder");
                     }}
-                    className="flex-1 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-medium"
+                    className="flex-1 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition font-medium"
                   >
                     ✓ Done
                   </button>

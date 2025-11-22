@@ -54,7 +54,7 @@ export default function IssuerViewRequests() {
       setError(null);
       // Fetch all requests (not just verified - includes approved and rejected too)
       const response = await axios.get("http://localhost:5000/issuer/allRequests");
-      
+
       if (response.data.success) {
         setRequests(response.data.requests);
         console.log(`📋 Loaded ${response.data.requests.length} requests`);
@@ -71,7 +71,7 @@ export default function IssuerViewRequests() {
 
   const handleApprove = (request) => {
     setSelectedRequest(request);
-    
+
     // Auto-fill form based on credential type
     const formData = {
       credentialType: request.vcType === "Academic Certificate" ? "AcademicCertificate" : "StudentID",
@@ -111,7 +111,7 @@ export default function IssuerViewRequests() {
 
   const handleIssueVC = async (e) => {
     e.preventDefault();
-    
+
     if (!issueFormData.photo) {
       alert("Please select a photo");
       return;
@@ -132,14 +132,14 @@ export default function IssuerViewRequests() {
       data.append("address", userAddress);
       data.append("holderDID", selectedRequest.holderDID);
       data.append("photo", issueFormData.photo);
-      
+
       // Student ID specific fields
       if (issueFormData.credentialType === "StudentID") {
         data.append("rollNumber", issueFormData.rollNumber);
         data.append("dob", issueFormData.dob);
         data.append("department", issueFormData.department);
       }
-      
+
       // Academic Certificate specific fields
       if (issueFormData.credentialType === "AcademicCertificate") {
         data.append("registerNumber", issueFormData.registerNumber);
@@ -192,10 +192,10 @@ export default function IssuerViewRequests() {
         // Close modal and refresh requests
         setShowIssueModal(false);
         setSelectedRequest(null);
-        
+
         // Refresh the requests list to show updated status
         await fetchRequests();
-        
+
         console.log('✅ Request approved and VC issued successfully');
         setIssuingVC(false);
         alert('✅ Credential issued successfully!');
@@ -218,7 +218,7 @@ export default function IssuerViewRequests() {
 
     try {
       setProcessingId(requestId);
-      
+
       console.log('❌ Rejecting request:', requestId);
       const response = await axios.post("http://localhost:5000/issuer/rejectRequest", {
         requestId: requestId,
@@ -292,7 +292,7 @@ export default function IssuerViewRequests() {
 
     try {
       console.log("🗑️ Deleting request:", requestId);
-      
+
       // Delete from backend
       const response = await axios.delete(`http://localhost:5000/issuer/request/${requestId}`, {
         data: { issuerAddress: userAddress }
@@ -338,14 +338,14 @@ export default function IssuerViewRequests() {
           className="mb-8"
         >
           <div className="flex items-center space-x-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/50">
+            <div className="w-16 h-16 bg-gradient-to-br from-navy-dark to-navy rounded-2xl flex items-center justify-center shadow-lg shadow-navy/50">
               <Inbox className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-extrabold bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent">
                 Credential Requests
               </h1>
-              <p className="text-slate-400 mt-1">Review and process holder credential requests</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">Review and process holder credential requests</p>
             </div>
           </div>
 
@@ -355,8 +355,8 @@ export default function IssuerViewRequests() {
               whileHover={{ scale: 1.02 }}
               className="glass-card p-4"
             >
-              <p className="text-slate-400 text-sm mb-1">Total Requests</p>
-              <p className="text-3xl font-bold text-white">{stats.total}</p>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">Total Requests</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
             </motion.div>
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -398,11 +398,10 @@ export default function IssuerViewRequests() {
             <button
               key={tab.value}
               onClick={() => setFilter(tab.value)}
-              className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${
-                filter === tab.value
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                  : "bg-slate-800/50 text-slate-400 hover:bg-slate-700/50"
-              }`}
+              className={`px-4 py-2 rounded-xl font-semibold transition-all whitespace-nowrap ${filter === tab.value
+                ? "bg-navy text-white shadow-lg shadow-navy/30"
+                : "bg-white dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 border border-slate-200 dark:border-slate-700"
+                }`}
             >
               {tab.label} ({tab.count})
             </button>
@@ -431,7 +430,7 @@ export default function IssuerViewRequests() {
             <div className="w-20 h-20 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Inbox className="w-10 h-10 text-slate-600" />
             </div>
-            <p className="text-slate-400 text-lg">No {filter !== "all" ? filter : ""} requests</p>
+            <p className="text-slate-600 dark:text-slate-400 text-lg">No {filter !== "all" ? filter : ""} requests</p>
             <p className="text-slate-500 text-sm mt-1">
               {filter === "pending" ? "All requests have been processed" : "Check back later for new requests"}
             </p>
@@ -444,31 +443,31 @@ export default function IssuerViewRequests() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="glass-card p-6 hover:border-blue-500/30 transition-all"
+                className="glass-card p-6 hover:border-navy/30 transition-all"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center">
                           <User className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-white">{request.holderName}</h3>
-                          <p className="text-sm text-slate-400">{request.credentialType}</p>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{request.holderName}</h3>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">{request.credentialType}</p>
                         </div>
                       </div>
                       {getStatusBadge(request.status)}
                     </div>
 
-                    <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-4 mb-3">
-                      <p className="text-slate-300 text-sm">{request.message}</p>
+                    <div className="bg-white dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-lg p-4 mb-3">
+                      <p className="text-slate-700 dark:text-slate-300 text-sm">{request.message}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-slate-500 mb-1">Holder DID:</p>
-                        <code className="text-purple-400 text-xs font-mono break-all">
+                        <p className="text-slate-600 dark:text-slate-500 mb-1">Holder DID:</p>
+                        <code className="text-blue-400 text-xs font-mono break-all">
                           {request.holderDID}
                         </code>
                       </div>
@@ -477,14 +476,14 @@ export default function IssuerViewRequests() {
                           <Calendar className="w-3 h-3" />
                           <span>Requested:</span>
                         </p>
-                        <p className="text-slate-300">{formatDate(request.requestedAt)}</p>
+                        <p className="text-slate-700 dark:text-slate-300">{formatDate(request.requestedAt)}</p>
                       </div>
                       {request.verificationID && (
                         <div className="md:col-span-2">
-                          <p className="text-slate-500 mb-1">
+                          <p className="text-slate-600 dark:text-slate-500 mb-1">
                             {request.credentialType === "Student ID" ? "Admission Number:" : "Education Govt ID:"}
                           </p>
-                          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-2">
+                          <div className="bg-navy/10 border border-navy/30 rounded-lg px-3 py-2">
                             <code className="text-blue-400 text-sm font-mono font-semibold">
                               {request.verificationID}
                             </code>
@@ -495,7 +494,7 @@ export default function IssuerViewRequests() {
 
                     {/* Attached Student ID VC - For Academic Certificate */}
                     {request.vcType === "Academic Certificate" && request.attachedStudentVC && (
-                      <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <div className="mt-3 p-3 bg-navy/10 border border-navy/30 rounded-lg">
                         <p className="text-blue-400 text-sm font-semibold mb-2 flex items-center space-x-2">
                           <FileText className="w-4 h-4" />
                           <span>🔗 Attached Student ID Credential</span>
@@ -581,7 +580,7 @@ export default function IssuerViewRequests() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              className="glass-card p-0 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative"
+              className="bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl p-0 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative"
             >
               {/* Decorative Background Elements */}
               <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl -z-10"></div>
@@ -656,7 +655,7 @@ export default function IssuerViewRequests() {
 
                   {/* Credential Type */}
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                       <FileText className="w-4 h-4 text-purple-400" />
                       Credential Type <span className="text-red-400">*</span>
                     </label>
@@ -665,7 +664,7 @@ export default function IssuerViewRequests() {
                         value={issueFormData.credentialType}
                         onChange={(e) => setIssueFormData({ ...issueFormData, credentialType: e.target.value })}
                         required
-                        className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-500 transition-all appearance-none cursor-pointer shadow-lg shadow-black/20"
+                        className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-600 transition-all appearance-none cursor-pointer shadow-lg shadow-black/20"
                       >
                         <option value="StudentID">🎓 Student ID</option>
                         <option value="AcademicCertificate">📜 Academic Certificate</option>
@@ -680,7 +679,7 @@ export default function IssuerViewRequests() {
 
                   {/* Student Name */}
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                       <User className="w-4 h-4 text-blue-400" />
                       Student Name <span className="text-red-400">*</span>
                     </label>
@@ -690,7 +689,7 @@ export default function IssuerViewRequests() {
                       onChange={(e) => setIssueFormData({ ...issueFormData, name: e.target.value })}
                       placeholder="Enter full name"
                       required
-                      className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base placeholder-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                      className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base placeholder-slate-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                     />
                   </div>
                 </div>
@@ -711,7 +710,7 @@ export default function IssuerViewRequests() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Roll Number */}
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <Hash className="w-4 h-4 text-cyan-400" />
                           Roll Number <span className="text-red-400">*</span>
                         </label>
@@ -721,13 +720,13 @@ export default function IssuerViewRequests() {
                           onChange={(e) => setIssueFormData({ ...issueFormData, rollNumber: e.target.value })}
                           placeholder="e.g., 2024CS001"
                           required
-                          className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base placeholder-slate-500 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                          className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base placeholder-slate-500 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                         />
                       </div>
 
                       {/* Date of Birth */}
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-blue-400" />
                           Date of Birth <span className="text-red-400">*</span>
                         </label>
@@ -736,14 +735,15 @@ export default function IssuerViewRequests() {
                           value={issueFormData.dob}
                           onChange={(e) => setIssueFormData({ ...issueFormData, dob: e.target.value })}
                           required
-                          className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                          style={{ colorScheme: "dark" }}
+                          className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                         />
                       </div>
                     </div>
 
                     {/* Department */}
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                      <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                         <BookOpen className="w-4 h-4 text-purple-400" />
                         Department <span className="text-red-400">*</span>
                       </label>
@@ -753,7 +753,7 @@ export default function IssuerViewRequests() {
                         onChange={(e) => setIssueFormData({ ...issueFormData, department: e.target.value })}
                         placeholder="e.g., Computer Science"
                         required
-                        className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base placeholder-slate-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                        className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base placeholder-slate-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                       />
                     </div>
                   </div>
@@ -774,7 +774,7 @@ export default function IssuerViewRequests() {
 
                     {/* Register Number */}
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                      <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                         <Hash className="w-4 h-4 text-amber-400" />
                         Register Number <span className="text-red-400">*</span>
                       </label>
@@ -784,14 +784,14 @@ export default function IssuerViewRequests() {
                         onChange={(e) => setIssueFormData({ ...issueFormData, registerNumber: e.target.value })}
                         placeholder="e.g., REG2024001"
                         required
-                        className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base placeholder-slate-500 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                        className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base placeholder-slate-500 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                       />
                     </div>
 
                     {/* Degree & Branch */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <GraduationCap className="w-4 h-4 text-blue-400" />
                           Degree <span className="text-red-400">*</span>
                         </label>
@@ -805,7 +805,7 @@ export default function IssuerViewRequests() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-purple-400" />
                           Branch <span className="text-red-400">*</span>
                         </label>
@@ -823,7 +823,7 @@ export default function IssuerViewRequests() {
                     {/* University & Location */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-cyan-400" />
                           University <span className="text-red-400">*</span>
                         </label>
@@ -837,7 +837,7 @@ export default function IssuerViewRequests() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-green-400" />
                           Location <span className="text-red-400">*</span>
                         </label>
@@ -855,7 +855,7 @@ export default function IssuerViewRequests() {
                     {/* CGPA & Class */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <Award className="w-4 h-4 text-yellow-400" />
                           CGPA <span className="text-red-400">*</span>
                         </label>
@@ -869,7 +869,7 @@ export default function IssuerViewRequests() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <Award className="w-4 h-4 text-orange-400" />
                           Class <span className="text-red-400">*</span>
                         </label>
@@ -878,7 +878,7 @@ export default function IssuerViewRequests() {
                             value={issueFormData.class}
                             onChange={(e) => setIssueFormData({ ...issueFormData, class: e.target.value })}
                             required
-                            className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 hover:border-slate-500 transition-all appearance-none cursor-pointer shadow-lg shadow-black/20"
+                            className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 hover:border-slate-600 transition-all appearance-none cursor-pointer shadow-lg shadow-black/20"
                           >
                             <option value="">Select Class</option>
                             <option value="First Class with Distinction">First Class with Distinction</option>
@@ -898,7 +898,7 @@ export default function IssuerViewRequests() {
                     {/* Exam Held In & Issue Date */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-pink-400" />
                           Exam Held In <span className="text-red-400">*</span>
                         </label>
@@ -908,11 +908,11 @@ export default function IssuerViewRequests() {
                           onChange={(e) => setIssueFormData({ ...issueFormData, examHeldIn: e.target.value })}
                           placeholder="e.g., May 2024"
                           required
-                          className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base placeholder-slate-500 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                          className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base placeholder-slate-500 focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                        <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-rose-400" />
                           Issue Date <span className="text-red-400">*</span>
                         </label>
@@ -921,7 +921,8 @@ export default function IssuerViewRequests() {
                           value={issueFormData.issueDate}
                           onChange={(e) => setIssueFormData({ ...issueFormData, issueDate: e.target.value })}
                           required
-                          className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base focus:border-rose-500 focus:ring-4 focus:ring-rose-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20"
+                          style={{ colorScheme: "dark" }}
+                          className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base focus:border-rose-500 focus:ring-4 focus:ring-rose-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20"
                         />
                       </div>
                     </div>
@@ -941,7 +942,7 @@ export default function IssuerViewRequests() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
                       <Image className="w-4 h-4 text-pink-400" />
                       Student Photo <span className="text-red-400">*</span>
                     </label>
@@ -951,7 +952,7 @@ export default function IssuerViewRequests() {
                         accept="image/*"
                         onChange={(e) => setIssueFormData({ ...issueFormData, photo: e.target.files[0] })}
                         required
-                        className="w-full px-5 py-4 bg-slate-800/80 backdrop-blur-sm border-2 border-slate-600 rounded-xl text-white text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-pink-600 file:cursor-pointer focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 hover:border-slate-500 transition-all shadow-lg shadow-black/20 cursor-pointer"
+                        className="w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-xl text-white text-base file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-pink-600 file:cursor-pointer focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 hover:border-slate-600 transition-all shadow-lg shadow-black/20 cursor-pointer"
                       />
                     </div>
                     <p className="text-xs text-slate-400 mt-2 ml-1 flex items-center gap-1.5">
@@ -1023,7 +1024,7 @@ export default function IssuerViewRequests() {
                   <Send className="w-12 h-12 text-white" />
                 </div>
               </motion.div>
-              
+
               <motion.div
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}

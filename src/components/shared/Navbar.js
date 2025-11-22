@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import {
   Home,
   FileText,
@@ -13,7 +14,9 @@ import {
   LogOut,
   Building2,
   Search,
-  UserCircle
+  UserCircle,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function Navbar({ userAddress, onLogout }) {
@@ -21,6 +24,7 @@ export default function Navbar({ userAddress, onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { userRole } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   // Role-based navigation items
   const getRoleNavItems = () => {
@@ -60,24 +64,24 @@ export default function Navbar({ userAddress, onLogout }) {
           icon: Building2,
           label: 'Issuer Portal',
           color: 'from-blue-400 to-indigo-400',
-          bgColor: 'bg-[#35577D]/20',
-          borderColor: 'border-[#35577D]/30'
+          bgColor: 'bg-navy/20',
+          borderColor: 'border-navy/30'
         };
       case 'holder':
         return {
           icon: User,
           label: 'Holder Portal',
-          color: 'from-purple-400 to-pink-400',
-          bgColor: 'bg-purple-500/20',
-          borderColor: 'border-purple-500/30'
+          color: 'from-blue-400 to-indigo-400',
+          bgColor: 'bg-navy/20',
+          borderColor: 'border-navy/30'
         };
       case 'verifier':
         return {
           icon: Search,
           label: 'Verifier Portal',
-          color: 'from-emerald-400 to-green-400',
-          bgColor: 'bg-emerald-500/20',
-          borderColor: 'border-emerald-500/30'
+          color: 'from-blue-400 to-indigo-400',
+          bgColor: 'bg-navy/20',
+          borderColor: 'border-navy/30'
         };
       default:
         return null;
@@ -96,14 +100,11 @@ export default function Navbar({ userAddress, onLogout }) {
   // Get portal background for navbar
   const getNavbarBackground = () => {
     const pathname = location.pathname;
-    if (pathname.startsWith('/issuer')) {
-      return 'linear-gradient(135deg, rgba(20, 30, 48, 0.95), rgba(53, 87, 125, 0.95))';
-    } else if (pathname.startsWith('/holder')) {
-      return 'linear-gradient(135deg, rgba(45, 30, 47, 0.95), rgba(78, 42, 79, 0.95))';
-    } else if (pathname.startsWith('/verifier')) {
-      return 'linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(40, 98, 58, 0.95))';
+    // Use the Navy Mirage theme colors (navy-dark to navy)
+    if (pathname.startsWith('/issuer') || pathname.startsWith('/holder') || pathname.startsWith('/verifier')) {
+      return '#141E30';
     }
-    return 'rgba(15, 23, 42, 0.95)'; // Default
+    return '#141E30'; // Default to navy-dark
   };
 
   return (
@@ -114,14 +115,14 @@ export default function Navbar({ userAddress, onLogout }) {
       style={{ background: getNavbarBackground() }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
-              className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center shadow-2xl shadow-indigo-400/60 ring-2 ring-white/30"
-              style={{ boxShadow: '0 8px 24px rgba(99, 102, 241, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.3)' }}
+              className="w-12 h-12 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center shadow-2xl shadow-navy/50 ring-2 ring-white/30"
+              style={{ boxShadow: '0 8px 24px rgba(30, 41, 59, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.3)' }}
             >
               <Shield className="w-7 h-7 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
             </motion.div>
@@ -136,7 +137,7 @@ export default function Navbar({ userAddress, onLogout }) {
                 textShadow: '0 0 30px rgba(99, 102, 241, 0.5)'
               }}
             >
-              DigiLocker
+              DID Vault
             </span>
           </Link>
 
@@ -185,6 +186,20 @@ export default function Navbar({ userAddress, onLogout }) {
                     </span>
                   </div>
                 )}
+                {/* Theme Toggle */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={toggleTheme}
+                  className="flex items-center justify-center w-10 h-10 bg-slate-800/50 rounded-xl border border-slate-700 hover:bg-slate-700/50 transition-all duration-300"
+                  aria-label="Toggle theme"
+                >
+                  {isDarkMode ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-indigo-400" />
+                  )}
+                </motion.button>
                 <div className="flex items-center space-x-2 px-4 py-2 bg-slate-800/50 rounded-xl border border-slate-700">
                   <Wallet className="w-4 h-4 text-indigo-400" />
                   <span className="text-sm font-mono text-slate-300">
@@ -264,6 +279,23 @@ export default function Navbar({ userAddress, onLogout }) {
                       </span>
                     </div>
                   )}
+                  {/* Mobile Theme Toggle */}
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-slate-800/50 rounded-xl border border-slate-700"
+                  >
+                    {isDarkMode ? (
+                      <>
+                        <Sun className="w-5 h-5 text-yellow-400" />
+                        <span className="font-medium text-slate-300">Light Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-5 h-5 text-indigo-400" />
+                        <span className="font-medium text-slate-300">Dark Mode</span>
+                      </>
+                    )}
+                  </button>
                   <div className="flex items-center space-x-2 px-4 py-3 bg-slate-800/50 rounded-xl border border-slate-700">
                     <Wallet className="w-5 h-5 text-indigo-400" />
                     <span className="text-sm font-mono text-slate-300">

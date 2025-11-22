@@ -160,14 +160,14 @@ export default function IssuerViewIssued() {
         >
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/50">
+              <div className="w-12 h-12 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center shadow-lg shadow-navy/50">
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <h1 className="text-4xl font-extrabold bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent">
                   Issued Credentials
                 </h1>
-                <p className="text-slate-400 mt-1">
+                <p className="text-slate-600 dark:text-slate-400 mt-1">
                   View and manage all credentials you've issued
                 </p>
               </div>
@@ -177,7 +177,7 @@ export default function IssuerViewIssued() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/issuer-dashboard")}
-              className="px-6 py-3 bg-slate-800/50 text-slate-300 rounded-xl border border-slate-700 hover:bg-slate-700/50 transition-all"
+              className="px-6 py-3 bg-white dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all"
             >
               ← Back to Dashboard
             </motion.button>
@@ -198,7 +198,7 @@ export default function IssuerViewIssued() {
               placeholder="Search by name, roll number, department, or CID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-gray-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
             />
           </div>
         </motion.div>
@@ -213,8 +213,8 @@ export default function IssuerViewIssued() {
           <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-400 text-sm mb-1">Total Issued</p>
-                <p className="text-3xl font-bold text-white">{credentials.length}</p>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">Total Issued</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{credentials.length}</p>
               </div>
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
                 <FileText className="w-6 h-6 text-blue-400" />
@@ -225,8 +225,8 @@ export default function IssuerViewIssued() {
           <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-400 text-sm mb-1">Filtered Results</p>
-                <p className="text-3xl font-bold text-white">{filteredCredentials.length}</p>
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">Filtered Results</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">{filteredCredentials.length}</p>
               </div>
               <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center">
                 <Search className="w-6 h-6 text-cyan-400" />
@@ -237,8 +237,8 @@ export default function IssuerViewIssued() {
           <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-slate-400 text-sm mb-1">Issuer Address</p>
-                <p className="text-sm font-mono text-white">
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-1">Issuer Address</p>
+                <p className="text-sm font-mono text-gray-900 dark:text-white">
                   {userAddress?.slice(0, 8)}...{userAddress?.slice(-6)}
                 </p>
               </div>
@@ -282,7 +282,7 @@ export default function IssuerViewIssued() {
             className="glass-card p-12 text-center"
           >
             <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               {searchTerm ? "No matching credentials" : "No credentials issued yet"}
             </h3>
             <p className="text-slate-400 mb-6">
@@ -322,10 +322,10 @@ export default function IssuerViewIssued() {
                           <User className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-white">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                             {cred.holderName || subject.name || "Unknown"}
                           </h3>
-                          <p className="text-sm text-slate-400">
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
                             {cred.credentialType || "Credential"}
                           </p>
                         </div>
@@ -336,32 +336,32 @@ export default function IssuerViewIssued() {
                         {(cred.credentialType?.includes("Academic") || cred.fullVC?.type?.some(t => t.includes("Academic"))) ? (
                           <>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">Register Number</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Register Number</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.registerNumber || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">Degree</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Degree</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.degree || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">University</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">University</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.university || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">CGPA</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">CGPA</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.cgpa || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">Class</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Class</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.class || "N/A"}
                               </p>
                             </div>
@@ -369,28 +369,28 @@ export default function IssuerViewIssued() {
                         ) : (
                           <>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">Roll Number</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Roll Number</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.rollNumber || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">Department</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Department</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.department || "N/A"}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs text-slate-500 mb-1">Date of Birth</p>
-                              <p className="text-sm text-slate-300 font-semibold">
+                              <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Date of Birth</p>
+                              <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold">
                                 {subject.dateOfBirth || subject.dob || "N/A"}
                               </p>
                             </div>
                           </>
                         )}
                         <div>
-                          <p className="text-xs text-slate-500 mb-1">Issued Date</p>
-                          <p className="text-sm text-slate-300 font-semibold flex items-center gap-1">
+                          <p className="text-xs text-slate-600 dark:text-slate-500 mb-1">Issued Date</p>
+                          <p className="text-sm text-slate-700 dark:text-slate-300 font-semibold flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {formatDate(issuanceDate || cred.issuanceDate)}
                           </p>
@@ -398,7 +398,7 @@ export default function IssuerViewIssued() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500">CID:</span>
+                        <span className="text-xs text-slate-600 dark:text-slate-500">CID:</span>
                         <code className="text-xs font-mono text-blue-400 bg-blue-500/10 px-2 py-1 rounded">
                           {cred.vcCID?.slice(0, 20)}...{cred.vcCID?.slice(-10)}
                         </code>

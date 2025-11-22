@@ -3,6 +3,7 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
       colors: {
@@ -18,6 +19,14 @@ module.exports = {
           700: '#4338ca',
           800: '#3730a3',
           900: '#312e81',
+        },
+        navy: {
+          DEFAULT: '#35577D',
+          light: '#3D5A7D',
+          dark: '#141E30',
+          darker: '#0F1922',
+          medium: '#2E4A6B',
+          accent: '#244058',
         },
       },
       fontFamily: {

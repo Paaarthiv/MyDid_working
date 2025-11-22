@@ -7,44 +7,44 @@ import { Wallet, Shield, Lock, Zap, CheckCircle } from "lucide-react";
 function Login({ onLogin }) {
   const [isConnecting, setIsConnecting] = useState(false);
   // 🔹 Auto-login on page load
-useEffect(() => {
-  const checkAlreadyConnected = async () => {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_accounts", []);
-        if (accounts.length > 0) {
-          // define handleLogin here
-          const signer = await provider.getSigner();
-          const address = await signer.getAddress();
-          const publicKey = address;
-          const did = `did:ethr:${address}`;
+  useEffect(() => {
+    const checkAlreadyConnected = async () => {
+      if (window.ethereum) {
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const accounts = await provider.send("eth_accounts", []);
+          if (accounts.length > 0) {
+            // define handleLogin here
+            const signer = await provider.getSigner();
+            const address = await signer.getAddress();
+            const publicKey = address;
+            const did = `did:ethr:${address}`;
 
-          localStorage.setItem("userAddress", address);
-          localStorage.setItem("did", did);
-          localStorage.setItem("publicKey", publicKey);
+            localStorage.setItem("userAddress", address);
+            localStorage.setItem("did", did);
+            localStorage.setItem("publicKey", publicKey);
 
-          const message = "Login to DID App";
-          const signature = await signer.signMessage(message);
+            const message = "Login to DID App";
+            const signature = await signer.signMessage(message);
 
-          const response = await axios.post("http://localhost:5000/login", {
-            address,
-            message,
-            signature,
-          });
+            const response = await axios.post("http://localhost:5000/login", {
+              address,
+              message,
+              signature,
+            });
 
-          if (response.data.success) {
-            onLogin(address, did, publicKey);
+            if (response.data.success) {
+              onLogin(address, did, publicKey);
+            }
           }
+        } catch (err) {
+          console.error("Auto-login check failed:", err);
         }
-      } catch (err) {
-        console.error("Auto-login check failed:", err);
       }
-    }
-  };
+    };
 
-  checkAlreadyConnected();
-}, [onLogin]); // only onLogin as dependency
+    checkAlreadyConnected();
+  }, [onLogin]); // only onLogin as dependency
 
 
   // 🔹 Common login flow
@@ -104,7 +104,7 @@ useEffect(() => {
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-900/20 to-slate-900" />
       <div className="absolute inset-0 bg-gradient-radial opacity-50" />
-      
+
       {/* Floating Orbs */}
       <motion.div
         animate={{
@@ -156,9 +156,9 @@ useEffect(() => {
             transition={{ delay: 0.3 }}
             className="text-4xl font-bold mb-3 gradient-text"
           >
-            DigiLocker
+            DID Vault
           </motion.h1>
-          
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -218,7 +218,7 @@ useEffect(() => {
                 <span>Connect MetaMask</span>
               </>
             )}
-            
+
             {/* Shine effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"

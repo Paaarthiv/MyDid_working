@@ -1,10 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Building2, User, Search, Shield, ArrowRight } from "lucide-react";
+import { Building2, User, Search, ArrowRight, Shield, Sun, Moon } from "lucide-react";
+import AnimatedPage from "./shared/AnimatedPage";
+import { useTheme } from "../context/ThemeContext";
 
 function RoleSelection() {
   const navigate = useNavigate();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const roles = [
     {
@@ -12,9 +15,9 @@ function RoleSelection() {
       title: "Issuer Portal",
       icon: Building2,
       description: "Issue and manage verifiable credentials",
-      color: "from-[#141E30] to-[#35577D]",
-      hoverColor: "hover:from-[#0F1922] hover:to-[#2E4A6B]",
-      bgGlow: "bg-[#35577D]/20",
+      color: "from-navy-dark to-navy",
+      hoverColor: "hover:from-navy-darker hover:to-navy-medium",
+      bgGlow: "bg-navy/20",
       route: "/issuer-login",
       features: ["Create VCs", "Manage Credentials", "BBS+ Signatures"]
     },
@@ -23,9 +26,9 @@ function RoleSelection() {
       title: "Holder Portal",
       icon: User,
       description: "Store and share your credentials securely",
-      color: "from-[#2D1E2F] to-[#4E2A4F]",
-      hoverColor: "hover:from-[#231823] hover:to-[#3E2240]",
-      bgGlow: "bg-[#4E2A4F]/20",
+      color: "from-navy-dark to-navy",
+      hoverColor: "hover:from-navy-darker hover:to-navy-medium",
+      bgGlow: "bg-navy/20",
       route: "/holder-login",
       features: ["View VCs", "Selective Disclosure", "Share Proofs"]
     },
@@ -34,9 +37,9 @@ function RoleSelection() {
       title: "Verifier Portal",
       icon: Search,
       description: "Verify credential authenticity",
-      color: "from-[#0F2027] to-[#28623A]",
-      hoverColor: "hover:from-[#0A1419] hover:to-[#1F5030]",
-      bgGlow: "bg-[#28623A]/20",
+      color: "from-navy-dark to-navy",
+      hoverColor: "hover:from-navy-darker hover:to-navy-medium",
+      bgGlow: "bg-navy/20",
       route: "/verifier-login",
       features: ["Scan QR Codes", "Verify Signatures", "Check Blockchain"]
     }
@@ -66,7 +69,17 @@ function RoleSelection() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-900/20 to-slate-900">
+    <AnimatedPage className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden w-full">
+      {/* Theme Toggle */}
+      <motion.button
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-lg hover:bg-white/20 transition-all z-50"
+      >
+        {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+      </motion.button>
+
       {/* Animated Background Orbs */}
       <motion.div
         animate={{
@@ -78,7 +91,7 @@ function RoleSelection() {
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="absolute top-20 left-20 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl"
+        className="absolute top-20 left-20 w-72 h-72 bg-navy/20 rounded-full blur-3xl"
       />
       <motion.div
         animate={{
@@ -90,10 +103,10 @@ function RoleSelection() {
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"
+        className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
       />
 
-      <div className="relative z-10 w-full max-w-7xl">
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -105,12 +118,12 @@ function RoleSelection() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-2xl shadow-indigo-500/50 mb-6"
+            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-navy-dark to-navy rounded-2xl shadow-2xl shadow-navy/50 mb-6"
           >
             <Shield className="w-10 h-10 text-white" />
           </motion.div>
 
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-indigo-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(99,102,241,0.5)]">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:from-blue-400 dark:via-indigo-400 dark:to-blue-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
             DID Vault
           </h1>
           <p className="text-slate-400 text-xl mb-2">Decentralized Digital Identity Management</p>
@@ -135,7 +148,7 @@ function RoleSelection() {
                 onClick={() => navigate(role.route)}
                 className="cursor-pointer group"
               >
-                <div className="relative h-full bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-8 overflow-hidden transition-all duration-300 hover:border-slate-600/50 hover:shadow-2xl">
+                <div className="relative h-full glass-card p-8 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:border-navy/30">
                   {/* Glow Effect */}
                   <div className={`absolute inset-0 ${role.bgGlow} opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl`} />
 
@@ -147,9 +160,9 @@ function RoleSelection() {
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-2xl font-bold text-white mb-3 flex items-center justify-between">
+                    <h2 className={`text-2xl font-bold mb-3 flex items-center justify-between ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                       {role.title}
-                      <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:translate-x-2 transition-all duration-300" />
+                      <ArrowRight className={`w-5 h-5 transition-all duration-300 ${isDarkMode ? 'text-slate-400 group-hover:text-white' : 'text-slate-500 group-hover:text-navy'}`} />
                     </h2>
 
                     {/* Description */}
@@ -165,7 +178,7 @@ function RoleSelection() {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.5 + index * 0.1 }}
-                          className="flex items-center space-x-2 text-slate-300 text-sm"
+                          className="flex items-center space-x-2 text-slate-400 text-sm"
                         >
                           <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${role.color}`} />
                           <span>{feature}</span>
@@ -199,7 +212,7 @@ function RoleSelection() {
           <p>Powered by Ethereum • IPFS • BBS+ Signatures</p>
         </motion.div>
       </div>
-    </div>
+    </AnimatedPage>
   );
 }
 

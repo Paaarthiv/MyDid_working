@@ -135,16 +135,16 @@ export default function ViewCredential() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#141E30] p-8 transition-colors duration-300">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-fadeIn">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                 📄 Verifiable Credential
               </h1>
-              <p className="text-gray-800 font-semibold">Complete verifiable credential information</p>
+              <p className="text-gray-600 dark:text-slate-300 font-semibold">Complete verifiable credential information</p>
             </div>
             <button
               onClick={() => navigate("/holder")}
@@ -156,9 +156,9 @@ export default function ViewCredential() {
         </div>
 
         {/* Main Credential Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6 animate-scaleIn">
+        <div className="bg-white dark:bg-slate-800/50 rounded-2xl shadow-2xl overflow-hidden mb-6 animate-scaleIn border border-gray-200 dark:border-slate-700">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white">
+          <div className="bg-gradient-to-r from-navy-dark to-navy p-8 text-white">
             <div className="flex items-center gap-6">
               {subject.photo && (
                 <img
@@ -226,66 +226,66 @@ export default function ViewCredential() {
           <div className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {/* Subject ID */}
-              <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                <p className="text-sm text-gray-700 mb-2 font-bold">Subject ID</p>
-                <p className="font-mono text-xs text-black break-all font-semibold">{getSubjectID()}</p>
+              <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">Subject ID</p>
+                <p className="font-mono text-xs text-gray-900 dark:text-slate-200 break-all font-semibold">{getSubjectID()}</p>
               </div>
 
               {/* Issuer */}
-              <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                <p className="text-sm text-gray-700 mb-2 font-bold">Issuer DID</p>
-                <p className="font-mono text-xs text-black break-all font-semibold">{getIssuerDID()}</p>
+              <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">Issuer DID</p>
+                <p className="font-mono text-xs text-gray-900 dark:text-slate-200 break-all font-semibold">{getIssuerDID()}</p>
               </div>
 
               {/* Issuance Date */}
-              <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                <p className="text-sm text-gray-700 mb-2 font-bold">Issuance Date</p>
-                <p className="text-black font-semibold">{formatDate(vc.issuanceDate)}</p>
+              <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">Issuance Date</p>
+                <p className="text-gray-900 dark:text-slate-200 font-semibold">{formatDate(vc.issuanceDate)}</p>
               </div>
 
               {/* IPFS CID */}
-              <div className="bg-gray-100 rounded-lg p-4 border border-gray-300">
-                <p className="text-sm text-gray-700 mb-2 font-bold">IPFS CID</p>
-                <p className="font-mono text-xs text-black break-all font-semibold">{cid}</p>
+              <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">IPFS CID</p>
+                <p className="font-mono text-xs text-gray-900 dark:text-slate-200 break-all font-semibold">{cid}</p>
               </div>
 
               {/* Document Hash */}
-              <div className="bg-gray-100 rounded-lg p-4 md:col-span-2 border border-gray-300">
-                <p className="text-sm text-gray-700 mb-2 font-bold">Document Hash</p>
-                <p className="font-mono text-xs text-black break-all font-semibold">{subject.documentHash || "N/A"}</p>
+              <div className="bg-gray-50 dark:bg-slate-900/50 rounded-lg p-4 md:col-span-2 border border-gray-200 dark:border-slate-700">
+                <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">Document Hash</p>
+                <p className="font-mono text-xs text-gray-900 dark:text-slate-200 break-all font-semibold">{subject.documentHash || "N/A"}</p>
               </div>
             </div>
 
             {/* Digital Signature Section */}
-            <div className="bg-blue-100 rounded-xl p-6 mb-8 border-2 border-blue-300">
-              <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+            <div className="bg-blue-50 dark:bg-slate-900/50 rounded-xl p-6 mb-8 border border-blue-200 dark:border-slate-700">
+              <h3 className="text-xl font-bold text-blue-900 dark:text-indigo-300 mb-4 flex items-center gap-2">
                 <span>🔐</span> Digital Signature Information
               </h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-white p-3 rounded-lg border border-blue-200">
-                    <p className="text-sm text-gray-700 mb-1 font-bold">Signature Type</p>
-                    <p className="text-black font-semibold">{proof.type || "N/A"}</p>
+                  <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-1 font-bold">Signature Type</p>
+                    <p className="text-gray-900 dark:text-slate-200 font-semibold">{proof.type || "N/A"}</p>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border border-blue-200">
-                    <p className="text-sm text-gray-700 mb-1 font-bold">Created</p>
-                    <p className="text-black font-semibold">{formatDate(proof.created)}</p>
+                  <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-1 font-bold">Created</p>
+                    <p className="text-gray-900 dark:text-slate-200 font-semibold">{formatDate(proof.created)}</p>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border border-blue-200">
-                    <p className="text-sm text-gray-700 mb-1 font-bold">Proof Purpose</p>
-                    <p className="text-black font-semibold">{proof.proofPurpose || "N/A"}</p>
+                  <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-1 font-bold">Proof Purpose</p>
+                    <p className="text-gray-900 dark:text-slate-200 font-semibold">{proof.proofPurpose || "N/A"}</p>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border border-blue-200">
-                    <p className="text-sm text-gray-700 mb-1 font-bold">Verification Method</p>
-                    <p className="font-mono text-xs text-black break-all font-semibold">
+                  <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-blue-100 dark:border-slate-700">
+                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-1 font-bold">Verification Method</p>
+                    <p className="font-mono text-xs text-gray-900 dark:text-slate-200 break-all font-semibold">
                       {proof.verificationMethod ? proof.verificationMethod.substring(0, 40) + "..." : "N/A"}
                     </p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-700 mb-2 font-bold">Proof Value (Base64)</p>
-                  <div className="bg-white p-4 rounded-lg border-2 border-blue-300 max-h-32 overflow-auto">
-                    <p className="font-mono text-xs text-black break-all font-semibold">
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-2 font-bold">Proof Value (Base64)</p>
+                  <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-blue-100 dark:border-slate-700 max-h-32 overflow-auto">
+                    <p className="font-mono text-xs text-gray-900 dark:text-slate-300 break-all font-semibold">
                       {proof.proofValue || "N/A"}
                     </p>
                   </div>
@@ -294,12 +294,12 @@ export default function ViewCredential() {
             </div>
 
             {/* QR Code Section */}
-            <div className="bg-gray-100 rounded-xl p-6 text-center mb-8 border-2 border-gray-300">
-              <h3 className="text-xl font-bold text-black mb-4 flex items-center justify-center gap-2">
+            <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 text-center mb-8 border border-gray-200 dark:border-slate-700">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-center gap-2">
                 <span>📱</span> QR Code for Verification
               </h3>
-              <p className="text-sm text-gray-800 mb-4 font-semibold">
-                Scan this QR code with the Verifier Portal to verify this credential
+              <p className="text-sm text-gray-600 dark:text-slate-300 mb-4 font-semibold">
+                Scan this code with the Verifier Portal to verify this credential
               </p>
               <div className="inline-block p-6 bg-white rounded-xl shadow-lg">
                 <QRCode
@@ -315,12 +315,12 @@ export default function ViewCredential() {
             </div>
 
             {/* Full JSON */}
-            <div className="bg-gray-100 rounded-xl p-6 border-2 border-gray-300">
-              <h3 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
+            <div className="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <span>📋</span> BBS+ Public Key
               </h3>
-              <div className="bg-white rounded-lg p-4 max-h-96 overflow-auto border-2 border-gray-400">
-                <pre className="text-xs text-black whitespace-pre-wrap font-mono font-semibold">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 max-h-96 overflow-auto border border-gray-300 dark:border-slate-600">
+                <pre className="text-xs text-gray-800 dark:text-slate-300 whitespace-pre-wrap font-mono font-semibold">
                   {JSON.stringify(vc, null, 2)}
                 </pre>
               </div>
@@ -332,21 +332,21 @@ export default function ViewCredential() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-slideIn">
           <button
             onClick={() => navigate(`/disclose/${cid}`)}
-            className="px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="px-6 py-4 bg-gradient-to-r from-navy-dark to-navy text-white rounded-xl hover:from-navy hover:to-navy-light transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             🔐 Generate Proof
           </button>
 
           <button
             onClick={() => window.open(`https://gateway.pinata.cloud/ipfs/${cid}`, "_blank")}
-            className="px-6 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="px-6 py-4 bg-emerald-700 text-white rounded-xl hover:bg-emerald-600 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             🌐 View on IPFS
           </button>
 
           <button
             onClick={() => navigate("/verifier")}
-            className="px-6 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="px-6 py-4 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             🔍 Verify Credential
           </button>
@@ -361,7 +361,7 @@ export default function ViewCredential() {
               link.download = `credential-${cid.substring(0, 8)}.json`;
               link.click();
             }}
-            className="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            className="px-6 py-4 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           >
             📥 Download VC
           </button>

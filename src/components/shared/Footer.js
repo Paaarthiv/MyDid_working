@@ -20,11 +20,11 @@ export default function Footer() {
                 <Shield className="w-6 h-6 text-white" />
               </motion.div>
               <span className="text-2xl font-bold gradient-text">
-                DigiLocker
+                DID Vault
               </span>
             </div>
             <p className="text-slate-400 text-sm max-w-md mb-4">
-              Decentralized Digital Identity Management powered by blockchain technology. 
+              Decentralized Digital Identity Management powered by blockchain technology.
               Secure, private, and verifiable credentials for the modern web.
             </p>
             <div className="flex items-center space-x-2 text-slate-400 text-sm">
@@ -82,7 +82,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
           <div className="text-slate-400 text-sm">
-            © {currentYear} DigiLocker. All rights reserved.
+            © {currentYear} DID Vault. All rights reserved.
           </div>
 
           {/* Social Links */}

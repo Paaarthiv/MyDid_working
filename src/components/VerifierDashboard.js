@@ -38,7 +38,7 @@ export default function VerifierDashboard() {
                 navigate("/");
               }
             }}
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
+            className="px-6 py-3 bg-navy hover:bg-navy-medium text-white rounded-xl shadow-lg transition-all duration-300 flex items-center gap-2 font-semibold"
           >
             ← Back to Home
           </button>
@@ -50,13 +50,13 @@ export default function VerifierDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#0F2027] to-[#28623A] rounded-2xl shadow-lg shadow-emerald-500/50 mb-4">
-            <Search className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-navy-dark to-navy rounded-2xl shadow-lg shadow-navy/50 mb-4">
+            <Search className="w-8 h-8 text-gray-900 dark:text-white" />
           </div>
-          <h1 className="text-5xl font-extrabold mb-4 pb-2 bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(16,185,129,0.5)]">
+          <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
             Verifier Dashboard
           </h1>
-          <p className="text-slate-400 text-lg">Verify and validate credentials</p>
+          <p className="text-slate-600 dark:text-slate-400 text-lg">Verify and validate credentials</p>
         </motion.div>
 
         {/* Action Buttons */}
@@ -71,13 +71,13 @@ export default function VerifierDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/verifier")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-emerald-500/10 hover:to-green-500/10 hover:border-emerald-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-navy/10 hover:to-navy-medium/10 hover:border-navy/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#0F2027] to-[#28623A] rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-500/50 transition-all">
-              <Shield className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-navy-dark to-navy rounded-2xl flex items-center justify-center shadow-lg shadow-navy/30 group-hover:shadow-navy/50 transition-all">
+              <Shield className="w-8 h-8 text-gray-900 dark:text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Verify Credential</h3>
-            <p className="text-slate-400 text-sm">Scan QR code or enter CID to verify credentials</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Verify Credential</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">Scan QR code or enter CID to verify credentials</p>
           </motion.button>
 
           <motion.button
@@ -85,13 +85,13 @@ export default function VerifierDashboard() {
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/verifier/profile")}
-            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-emerald-500/10 hover:to-green-500/10 hover:border-emerald-500/30 transition-all duration-300 group"
+            className="glass-card p-8 text-center hover:bg-gradient-to-br hover:from-navy/10 hover:to-navy-medium/10 hover:border-navy/30 transition-all duration-300 group"
           >
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#0F2027] to-[#28623A] rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:shadow-emerald-500/50 transition-all">
-              <User className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-navy-dark to-navy rounded-2xl flex items-center justify-center shadow-lg shadow-navy/30 group-hover:shadow-navy/50 transition-all">
+              <User className="w-8 h-8 text-gray-900 dark:text-white" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">View Profile</h3>
-            <p className="text-slate-400 text-sm">View your wallet address, DID, and public key</p>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">View Profile</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">View your wallet address, DID, and public key</p>
           </motion.button>
         </motion.div>
       </div>

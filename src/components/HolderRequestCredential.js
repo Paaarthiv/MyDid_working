@@ -248,15 +248,15 @@ export default function HolderRequestCredential() {
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-6">
             <div className="relative">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center shadow-xl shadow-purple-500/20 transform hover:scale-105 transition-transform">
+              <div className="w-20 h-20 bg-gradient-to-br from-navy-dark to-navy rounded-3xl flex items-center justify-center shadow-xl shadow-navy/20 transform hover:scale-105 transition-transform">
                 <Send className="w-10 h-10 text-white" />
               </div>
             </div>
             <div className="flex-1">
-              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.5)]">
+              <h1 className="text-4xl sm:text-5xl font-extrabold mb-2 pb-2 bg-gradient-to-r from-navy-dark via-navy to-navy-dark dark:text-white dark:bg-none bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(53,87,125,0.5)]">
                 Request Credential
               </h1>
-              <p className="text-slate-400 text-lg">Submit a verified request to issuers for digital credentials</p>
+              <p className="text-slate-600 dark:text-slate-400 text-lg">Submit a verified request to issuers for digital credentials</p>
               <div className="flex items-center gap-2 mt-3">
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-full">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -277,32 +277,32 @@ export default function HolderRequestCredential() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-purple-500/10 backdrop-blur-xl border border-purple-500/20 rounded-3xl shadow-2xl p-12 relative overflow-hidden w-full"
+            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl shadow-2xl p-12 relative overflow-hidden w-full"
           >
             {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-slate-500/5 to-slate-600/5 rounded-full blur-3xl -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-slate-500/5 to-slate-600/5 rounded-full blur-3xl -z-10"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-navy-dark/5 to-navy/5 rounded-full blur-3xl -z-10"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-navy-dark/5 to-navy/5 rounded-full blur-3xl -z-10"></div>
 
             <div className="w-full px-2 sm:px-4">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center">
                       <FileText className="w-6 h-6 text-white" />
                     </div>
                     <span>New Request</span>
                   </h2>
-                  <p className="text-slate-600 text-sm ml-15">Fill in the details below to submit your request</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">Fill in the details below to submit your request</p>
                 </div>
-                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-100 border border-slate-200 rounded-xl">
+                <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
                   <div className="flex items-center gap-1">
                     <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
-                    <span className="text-xs text-slate-700 font-medium">Details</span>
+                    <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">Details</span>
                   </div>
-                  <div className="w-8 h-px bg-slate-300"></div>
+                  <div className="w-8 h-px bg-slate-300 dark:bg-slate-600"></div>
                   <div className="flex items-center gap-1">
-                    <div className="w-6 h-6 bg-slate-400 rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
-                    <span className="text-xs text-slate-500 font-medium">Submit</span>
+                    <div className="w-6 h-6 bg-slate-400 dark:bg-slate-600 rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Submit</span>
                   </div>
                 </div>
               </div>
@@ -339,32 +339,32 @@ export default function HolderRequestCredential() {
               {/* Two Column Layout for Identity and Credential Details */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 {/* Section 1: Identity Information */}
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-300 shadow-2xl">
+                <div className="bg-white dark:bg-slate-800/50 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-200 dark:border-slate-700 shadow-xl">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center">
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-800">Identity Information</h3>
-                      <p className="text-xs text-slate-500">Your verified identity details</p>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Identity Information</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Your verified identity details</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     {/* Your DID */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                         <Hash className="w-4 h-4 text-slate-500" />
                         Your DID (Auto-filled)
                       </label>
-                      <div className="bg-white border-2 border-slate-300 rounded-xl p-4 hover:border-slate-400 transition-all">
-                        <code className="text-purple-600 text-sm font-mono break-all leading-relaxed font-semibold">{did}</code>
+                      <div className="bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                        <code className="text-navy dark:text-blue-400 text-sm font-mono break-all leading-relaxed font-semibold">{did}</code>
                       </div>
                     </div>
 
                     {/* Your Name */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                         <User className="w-4 h-4 text-slate-500" />
                         Your Name <span className="text-xs text-slate-500 font-normal" >*</span>
                       </label>
@@ -374,28 +374,28 @@ export default function HolderRequestCredential() {
                         onChange={(e) => setHolderName(e.target.value)}
                         placeholder="Enter your full name"
                         required
-                        className="w-full px-5 py-3 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-base placeholder-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all"
+                        className="w-full px-5 py-3 bg-white dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white text-base placeholder-slate-400 focus:border-navy focus:ring-4 focus:ring-navy/20 hover:border-slate-300 dark:hover:border-slate-600 transition-all"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Section 2: Credential Details */}
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-300 shadow-2xl">
+                <div className="bg-white dark:bg-slate-800/50 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-200 dark:border-slate-700 shadow-xl">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center">
                       <CreditCard className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg sm:text-xl font-bold text-slate-800">Credential Details</h3>
-                      <p className="text-xs text-slate-500">Specify what you're requesting</p>
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Credential Details</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Specify what you're requesting</p>
                     </div>
                   </div>
 
                   <div className="space-y-8">
                     {/* Credential Type */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                         <GraduationCap className="w-4 h-4 text-slate-500" />
                         Credential Type <span className="text-red-500">*</span>
                       </label>
@@ -407,7 +407,7 @@ export default function HolderRequestCredential() {
                             setVerificationID("");
                           }}
                           required
-                          className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all appearance-none cursor-pointer"
+                          className="w-full px-8 py-5 bg-white dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white text-lg focus:border-navy focus:ring-4 focus:ring-navy/20 hover:border-slate-300 dark:hover:border-slate-600 transition-all appearance-none cursor-pointer"
                         >
                           <option value="Student ID">🎓 Student ID</option>
                           <option value="Academic Certificate">📜 Academic Certificate</option>
@@ -422,7 +422,7 @@ export default function HolderRequestCredential() {
 
                     {/* Verification ID */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                         <Hash className="w-4 h-4 text-slate-500" />
                         {credentialType === "Student ID" ? "Admission Number" : "Education Govt ID"} <span className="text-red-500">*</span>
                       </label>
@@ -432,7 +432,7 @@ export default function HolderRequestCredential() {
                         onChange={(e) => setVerificationID(e.target.value)}
                         placeholder={credentialType === "Student ID" ? "e.g., ADM2024001" : "e.g., EDU123456789"}
                         required
-                        className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all"
+                        className="w-full px-8 py-5 bg-white dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white text-lg placeholder-slate-400 focus:border-navy focus:ring-4 focus:ring-navy/20 hover:border-slate-300 dark:hover:border-slate-600 transition-all"
                       />
                       <p className="text-xs text-slate-500 mt-2 ml-1">
                         {credentialType === "Student ID"
@@ -446,25 +446,25 @@ export default function HolderRequestCredential() {
 
               {/* Attach Student ID VC - Only for Academic Certificate */}
               {credentialType === "Academic Certificate" && (
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-8 lg:p-16 border-2 border-slate-300 shadow-2xl">
+                <div className="bg-white dark:bg-slate-800/50 backdrop-blur-md rounded-2xl p-8 lg:p-16 border-2 border-slate-200 dark:border-slate-700 shadow-xl">
                   <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center">
                       <Link2 className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-slate-800">Attach Student ID</h3>
-                      <p className="text-xs text-slate-500">Link your existing Student ID credential</p>
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-white">Attach Student ID</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Link your existing Student ID credential</p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                       <BookOpen className="w-4 h-4 text-slate-500" />
                       Your Student ID Credential <span className="text-red-500">*</span>
                     </label>
 
                     {loadingVCs ? (
-                      <div className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-700 flex items-center gap-3">
+                      <div className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-300 flex items-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-2 border-green-500 border-t-transparent"></div>
                         <span>Loading your Student ID credentials...</span>
                       </div>
@@ -484,7 +484,7 @@ export default function HolderRequestCredential() {
                             value={selectedStudentVC}
                             onChange={(e) => setSelectedStudentVC(e.target.value)}
                             required
-                            className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all appearance-none cursor-pointer"
+                            className="w-full px-8 py-5 bg-white dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white text-lg focus:border-navy focus:ring-4 focus:ring-navy/20 hover:border-slate-300 dark:hover:border-slate-600 transition-all appearance-none cursor-pointer"
                           >
                             <option value="">Select a Student ID to attach</option>
                             {myStudentIDVCs.map((vc, index) => (
@@ -519,20 +519,20 @@ export default function HolderRequestCredential() {
                               return vc ? (
                                 <div className="grid grid-cols-2 gap-3 text-sm">
                                   <div>
-                                    <p className="text-slate-600 text-xs mb-1 font-semibold">Name</p>
-                                    <p className="text-slate-800 font-bold">{vc.credentialSubject?.name}</p>
+                                    <p className="text-slate-600 dark:text-slate-400 text-xs mb-1 font-semibold">Name</p>
+                                    <p className="text-slate-800 dark:text-white font-bold">{vc.credentialSubject?.name}</p>
                                   </div>
                                   <div>
-                                    <p className="text-slate-600 text-xs mb-1 font-semibold">Roll Number</p>
-                                    <p className="text-slate-800 font-bold">{vc.credentialSubject?.rollNumber}</p>
+                                    <p className="text-slate-600 dark:text-slate-400 text-xs mb-1 font-semibold">Roll Number</p>
+                                    <p className="text-slate-800 dark:text-white font-bold">{vc.credentialSubject?.rollNumber}</p>
                                   </div>
                                   <div>
-                                    <p className="text-slate-600 text-xs mb-1 font-semibold">Department</p>
-                                    <p className="text-slate-800 font-bold">{vc.credentialSubject?.department}</p>
+                                    <p className="text-slate-600 dark:text-slate-400 text-xs mb-1 font-semibold">Department</p>
+                                    <p className="text-slate-800 dark:text-white font-bold">{vc.credentialSubject?.department}</p>
                                   </div>
                                   <div>
-                                    <p className="text-slate-600 text-xs mb-1 font-semibold">CID</p>
-                                    <code className="text-slate-700 text-xs font-mono font-semibold">{vc.cid.substring(0, 15)}...</code>
+                                    <p className="text-slate-600 dark:text-slate-400 text-xs mb-1 font-semibold">CID</p>
+                                    <code className="text-slate-700 dark:text-slate-300 text-xs font-mono font-semibold">{vc.cid.substring(0, 15)}...</code>
                                   </div>
                                 </div>
                               ) : null;
@@ -546,19 +546,19 @@ export default function HolderRequestCredential() {
               )}
 
               {/* Section 3: Request Message */}
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-300 shadow-2xl">
+              <div className="bg-white dark:bg-slate-800/50 backdrop-blur-md rounded-2xl p-5 lg:p-6 border-2 border-slate-200 dark:border-slate-700 shadow-xl">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-navy-dark to-navy rounded-xl flex items-center justify-center">
                     <MessageSquare className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-800">Request Message</h3>
-                    <p className="text-xs text-slate-500">Explain your request to the issuer</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Request Message</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Explain your request to the issuer</p>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-slate-500" />
                     Your Message <span className="text-red-500">*</span>
                   </label>
@@ -568,7 +568,7 @@ export default function HolderRequestCredential() {
                     placeholder="E.g., I am requesting an academic certificate for my graduation in 2024. I have completed all requirements and need this for employment purposes..."
                     rows={4}
                     required
-                    className="w-full px-8 py-5 bg-white border-2 border-slate-300 rounded-xl text-slate-800 text-lg placeholder-slate-400 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 hover:border-slate-400 transition-all resize-none leading-relaxed"
+                    className="w-full px-8 py-5 bg-white dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white text-lg placeholder-slate-400 focus:border-navy focus:ring-4 focus:ring-navy/20 hover:border-slate-300 dark:hover:border-slate-600 transition-all resize-none leading-relaxed"
                   />
                   <p className="text-xs text-slate-500 mt-2 ml-1">
                     Provide details about what credential you need and why you're requesting it
@@ -583,7 +583,7 @@ export default function HolderRequestCredential() {
                   disabled={isSubmitting || !message.trim()}
                   whileHover={{ scale: isSubmitting ? 1 : 1.01 }}
                   whileTap={{ scale: isSubmitting ? 1 : 0.99 }}
-                  className="w-full max-w-md mx-auto block bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full max-w-md mx-auto block bg-gradient-to-r from-navy-dark to-navy hover:from-navy-darker hover:to-navy-medium text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-navy/30"
                 >
                   {isSubmitting ? (
                     <>
@@ -613,17 +613,17 @@ export default function HolderRequestCredential() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             onClick={() => navigate("/holder/my-requests")}
-            className="w-full glass-card p-6 hover:bg-purple-500/10 hover:border-purple-500/50 transition-all duration-300 group"
+            className="w-full glass-card p-6 hover:bg-navy/5 hover:border-navy/20 transition-all duration-300 group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Clock className="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform" />
+                <Clock className="w-6 h-6 text-navy group-hover:scale-110 transition-transform" />
                 <div className="text-left">
-                  <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">View My Requests</h3>
-                  <p className="text-slate-400 text-sm">Track the status of your credential requests</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-navy dark:group-hover:text-blue-300 transition-colors">View My Requests</h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm">Track the status of your credential requests</p>
                 </div>
               </div>
-              <div className="text-purple-400 text-2xl group-hover:translate-x-1 transition-transform">→</div>
+              <div className="text-navy text-2xl group-hover:translate-x-1 transition-transform">→</div>
             </div>
           </motion.button>
         </div>
