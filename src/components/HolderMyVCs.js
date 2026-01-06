@@ -216,7 +216,7 @@ export default function HolderMyVCs() {
       "License": "🪪",
       "Diploma": "📄",
       "Badge": "🏅",
-      "default": "🆔"
+      "default": ""
     };
     return icons[type] || icons.default;
   };
@@ -257,7 +257,7 @@ export default function HolderMyVCs() {
                   <p className="text-blue-100 text-sm mb-1">Total Credentials</p>
                   <p className="text-4xl font-bold">{stats.totalCredentials}</p>
                 </div>
-                <div className="text-5xl opacity-50">📚</div>
+                <div className="text-5xl opacity-50"></div>
               </div>
             </div>
 
@@ -267,7 +267,7 @@ export default function HolderMyVCs() {
                   <p className="text-blue-100 text-sm mb-1">Verified</p>
                   <p className="text-4xl font-bold">{stats.totalCredentials}</p>
                 </div>
-                <div className="text-5xl opacity-50">✅</div>
+                <div className="text-5xl opacity-50"></div>
               </div>
             </div>
 
@@ -281,7 +281,7 @@ export default function HolderMyVCs() {
                       : "N/A"}
                   </p>
                 </div>
-                <div className="text-5xl opacity-50">📅</div>
+                <div className="text-5xl opacity-50"></div>
               </div>
             </div>
           </div>
@@ -363,6 +363,24 @@ export default function HolderMyVCs() {
                 const vcCID = vc.cid || vc.vcCID;
                 const documentType = subject.documentType || vc.documentType || "Credential";
 
+                // Helper function to get issuer DID from multiple possible locations
+                const getIssuerDID = () => {
+                  // Check top-level issuerDID property first
+                  if (vc.issuerDID) return vc.issuerDID;
+                  // Check inside the VC object
+                  if (vc.vc?.issuer) {
+                    if (typeof vc.vc.issuer === 'string') return vc.vc.issuer;
+                    if (vc.vc.issuer.id) return vc.vc.issuer.id;
+                  }
+                  // Check if issuer is directly on vc
+                  if (vc.issuer) {
+                    if (typeof vc.issuer === 'string') return vc.issuer;
+                    if (vc.issuer.id) return vc.issuer.id;
+                  }
+                  return null;
+                };
+                const issuerDID = getIssuerDID();
+
                 return (
                   <div
                     key={vcCID || index}
@@ -440,7 +458,7 @@ export default function HolderMyVCs() {
                         <div>
                           <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">Issuer DID</p>
                           <p className="font-mono text-xs text-blue-600 break-all">
-                            {vc.issuerDID ? vc.issuerDID.substring(0, 30) + "..." : "N/A"}
+                            {issuerDID ? issuerDID.substring(0, 30) + "..." : "N/A"}
                           </p>
                         </div>
 

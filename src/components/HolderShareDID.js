@@ -50,7 +50,7 @@ export default function HolderShareDID() {
       if (response.data.success) {
         setIsShared(true);
         setShowNameInput(false);
-        console.log("✅ DID shared successfully");
+        console.log(" DID shared successfully");
       } else {
         setError(response.data.message || "Failed to share DID");
       }
@@ -183,7 +183,7 @@ export default function HolderShareDID() {
       {/* Info Box */}
       <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <p className="text-xs text-blue-800 dark:text-blue-300">
-          <strong>ℹ️ Why share your DID?</strong><br />
+          <strong>Why share your DID?</strong><br />
           When you share your DID, issuers can select you from their list and issue credentials directly to you.
           You'll automatically receive these credentials in your wallet.
         </p>

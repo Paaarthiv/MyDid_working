@@ -18,25 +18,6 @@
     "approvedBy": "0x480b1B5Ff78734158711D489aD3aD312379118f3",
     "approvedAt": "2025-11-06T14:03:27.301Z"
   },
-  "c9f997b3-6530-4224-b1b3-6c1be3a7540f": {
-    "requestId": "c9f997b3-6530-4224-b1b3-6c1be3a7540f",
-    "holderDID": "did:ethr:0x480b1B5Ff78734158711D489aD3aD312379118f3",
-    "holderAddress": "0x480b1B5Ff78734158711D489aD3aD312379118f3",
-    "holderName": "Paru",
-    "vcType": "Student ID",
-    "verificationID": "1234",
-    "message": "Give me the ID",
-    "status": "approved",
-    "createdAt": "2025-11-21T20:35:02.815Z",
-    "nonceId": "fc69fb68-d79b-4e45-a96c-017e26255504",
-    "verifiedAt": "2025-11-21T20:35:08.282Z",
-    "signature": "0xd75cd5118f1bea479699e8d398389d5e5383f2ea4959f24a9dfea9cf82b8479d4edf35602cc01462aba6e7cdfa6872d435372c9fe2d39f544aee68a7a529a1b81b",
-    "recoveredAddress": "0x480b1B5Ff78734158711D489aD3aD312379118f3",
-    "updatedAt": "2025-11-21T20:37:07.796Z",
-    "issuedVCCID": "QmXWCQuWJ9M9jvgqpGhbMMpQfXvTBijGi79yEf1Vum1Vt8",
-    "approvedBy": "0x480b1B5Ff78734158711D489aD3aD312379118f3",
-    "approvedAt": "2025-11-21T20:37:07.796Z"
-  },
   "2a2d7bd1-e3d3-4567-8ced-ee33afcec122": {
     "requestId": "2a2d7bd1-e3d3-4567-8ced-ee33afcec122",
     "holderDID": "did:ethr:0x480b1B5Ff78734158711D489aD3aD312379118f3",

@@ -102,8 +102,12 @@ module.exports = (loggedInUsers, bbsLib) => {
         }
 
         if (isValidStructure) {
+          const issuerIdentifier = typeof actualVC.issuer === "string"
+            ? actualVC.issuer
+            : (actualVC.issuer?.id || (typeof vcData?.issuer === "string" ? vcData.issuer : vcData?.issuer?.id));
+
           verificationResult.structureValid = true;
-          verificationResult.details.issuer = actualVC.issuer?.id || vcData.issuer?.id || "Unknown";
+          verificationResult.details.issuer = issuerIdentifier || "Unknown";
           verificationResult.details.subject = actualVC.credentialSubject?.id || "Disclosed via Selective Disclosure";
           verificationResult.details.issuanceDate = actualVC.issuanceDate || vcData.created || new Date().toISOString();
           verificationResult.details.proofType = actualVC.proof.type;
@@ -130,17 +134,55 @@ module.exports = (loggedInUsers, bbsLib) => {
             try {
               console.log("🔐 Verifying BBS+ signature...");
               
+              const issuerIdForMessages = issuerIdentifier || (typeof actualVC.issuer === "string" ? actualVC.issuer : actualVC.issuer?.id) || "";
+              const subject = actualVC.credentialSubject || {};
+
+              const determineVCType = () => {
+                if (Array.isArray(actualVC.type)) {
+                  if (actualVC.type.includes("AcademicCertificate")) return "AcademicCertificate";
+                  if (actualVC.type.includes("StudentID")) return "StudentID";
+                }
+                if (typeof actualVC.type === "string") {
+                  return actualVC.type;
+                }
+                // Fallback heuristics based on fields present
+                if (subject.registerNumber || subject.degree || subject.cgpa) {
+                  return "AcademicCertificate";
+                }
+                return "StudentID";
+              };
+
+              const vcType = determineVCType();
+              console.log(`📋 Detected VC type for BBS verification: ${vcType}`);
+
               // Extract messages in same order as signing
-              const messages = [
-                actualVC.credentialSubject.name,
-                actualVC.credentialSubject.rollNumber,
-                actualVC.credentialSubject.dateOfBirth,
-                actualVC.credentialSubject.department,
-                actualVC.credentialSubject.id,
-                actualVC.issuer.id,
-                actualVC.issuanceDate,
-                actualVC.credentialSubject.documentHash
-              ];
+              const messages = vcType === "AcademicCertificate"
+                ? [
+                    subject.name,
+                    subject.registerNumber,
+                    subject.degree,
+                    subject.branch,
+                    subject.university,
+                    subject.location,
+                    subject.cgpa,
+                    subject.class,
+                    subject.examHeldIn,
+                    subject.issuedDate,
+                    subject.id,
+                    issuerIdForMessages,
+                    actualVC.issuanceDate,
+                    subject.documentHash
+                  ]
+                : [
+                    subject.name,
+                    subject.rollNumber,
+                    subject.dateOfBirth,
+                    subject.department,
+                    subject.id,
+                    issuerIdForMessages,
+                    actualVC.issuanceDate,
+                    subject.documentHash
+                  ];
 
               // Convert to Uint8Array
               const encoder = new TextEncoder();

@@ -131,6 +131,9 @@ export default function IssuerViewRequests() {
       data.append("name", issueFormData.name);
       data.append("address", userAddress);
       data.append("holderDID", selectedRequest.holderDID);
+      if (selectedRequest.holderAddress) {
+        data.append("holderAddress", selectedRequest.holderAddress);
+      }
       data.append("photo", issueFormData.photo);
 
       // Student ID specific fields

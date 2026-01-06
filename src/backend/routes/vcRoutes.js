@@ -36,7 +36,7 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
    */
   router.post("/issueVC", upload.single("photo"), async (req, res) => {
     const { 
-      name, address, holderDID, credentialType,
+      name, address, holderDID, credentialType, holderAddress,
       // Student ID fields
       rollNumber, dob, department, documentType,
       // Academic Certificate fields
@@ -281,8 +281,9 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
         console.log("✅ Fallback HMAC signature generated");
       }
 
-      // Add proof to VC
       const issuerDID = vcType === "AcademicCertificate" ? vc.issuer : vc.issuer.id;
+
+      // Add proof to VC
       vc.proof = {
         type: signatureType,
         created: new Date().toISOString(),
@@ -315,22 +316,54 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
       // Step 8: Store VC reference for holder (internal call)
       try {
         const axios = require('axios');
-        await axios.post('http://localhost:5000/holder/store-vc', {
-          holderAddress: address,
-          vcCID: vcCID,
-          issuerDID: vc.issuer.id,
-          issuanceDate: vc.issuanceDate,
-          credentialType: vc.type[1] || "VerifiableCredential",
-          credentialSubject: {
-            name: name,
-            rollNumber: rollNumber,
-            department: department,
-            dateOfBirth: dob,
-            documentType: documentType || "Student ID",
-            documentHash: documentHash
+        const holderWalletAddress = (() => {
+          if (holderAddress) {
+            return holderAddress;
           }
-        });
-        console.log("✅ VC reference stored for holder");
+          if (holderDID && holderDID.includes(":")) {
+            const parts = holderDID.split(":");
+            return parts[parts.length - 1];
+          }
+          return null;
+        })();
+
+        if (!holderWalletAddress) {
+          console.warn("⚠️ Could not derive holder wallet address from DID - skipping holder store call");
+        } else {
+          const subject = vc.credentialSubject || {};
+          const credentialSummary = vcType === "AcademicCertificate"
+            ? {
+                name: subject.name,
+                registerNumber: subject.registerNumber,
+                degree: subject.degree,
+                branch: subject.branch,
+                university: subject.university,
+                location: subject.location,
+                cgpa: subject.cgpa,
+                class: subject.class,
+                examHeldIn: subject.examHeldIn,
+                issuedDate: subject.issuedDate,
+                documentHash: subject.documentHash
+              }
+            : {
+                name: subject.name,
+                rollNumber: subject.rollNumber,
+                department: subject.department,
+                dateOfBirth: subject.dateOfBirth,
+                documentType: subject.documentType || documentType || "Student ID",
+                documentHash: subject.documentHash
+              };
+
+          await axios.post('http://localhost:5000/holder/store-vc', {
+            holderAddress: holderWalletAddress,
+            vcCID: vcCID,
+            issuerDID: issuerDID,
+            issuanceDate: vc.issuanceDate,
+            credentialType: vc.type[1] || "VerifiableCredential",
+            credentialSubject: credentialSummary
+          });
+          console.log(`✅ VC reference stored for holder (${holderWalletAddress})`);
+        }
       } catch (storeError) {
         console.warn("⚠️ Could not store VC reference for holder:", storeError.message);
         // Don't fail the issuance if storage fails

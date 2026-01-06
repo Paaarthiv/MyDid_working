@@ -1,4 +1,35 @@
+# Decentralized Identity Management App (DID App)
+
+## 🐳 Docker Usage (Recommended)
+
+Quickly start the entire application (Frontend + Backend) with Docker.
+
+### Prerequisites
+- Docker & Docker Compose installed
+- MetaMask Browser Extension
+
+### Quick Start
+1. **Navigate to the project root**:
+   ```bash
+   cd "did app/mydid"
+   ```
+2. **Setup Environment**:
+   Ensure you have a `.env` file in `src/backend/` (see `src/backend/.env.example`).
+3. **Run with Docker Compose**:
+   ```bash
+   docker-compose up -d --build
+   ```
+4. **Access the App**:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend: [http://localhost:5000](http://localhost:5000)
+
+### 🔒 Security Note
+This Docker setup **does NOT** store or access your MetaMask private keys. All blockchain transaction signing happens strictly in your **browser** via the MetaMask extension. The backend only handles public data verification and IPFS storage.
+
+---
+
 # Getting Started with Create React App
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
