@@ -1,101 +1,76 @@
-# Decentralized Identity Management App (DID App)
+# MyDID — Decentralized Identity Management System
 
-## 🐳 Docker Usage (Recommended)
+Blockchain-based decentralized identity (DID) platform that lets users create, manage, and verify digital identities **without relying on centralized authorities** — tamper-proof, user-owned credential verification on Ethereum.
 
-Quickly start the entire application (Frontend + Backend) with Docker.
+## ✨ Key Features
+
+- **Self-sovereign identity** — users own and control their credentials; no central authority
+- **MetaMask wallet authentication** — all transaction signing happens in the browser; private keys never touch the backend
+- **Ethereum smart contracts (Sepolia)** — on-chain DID registration and verification with Solidity
+- **IPFS document storage** — decentralized, content-addressed storage for identity documents
+- **Selective disclosure** — share only the credentials a verifier needs
+- **Dockerized services** — one-command startup for the full stack
+
+## 🏗️ Architecture
+
+```
+┌──────────────┐     ┌───────────────────┐     ┌──────────────────┐
+│  React.js UI │────▶│ Node.js / Express │────▶│ Ethereum (Sepolia)│
+│  + MetaMask  │     │     REST API      │     │  Smart Contracts  │
+└──────────────┘     └─────────┬─────────┘     └──────────────────┘
+                               │
+                               ▼
+                        ┌─────────────┐
+                        │    IPFS     │
+                        │ Doc Storage │
+                        └─────────────┘
+```
+
+**Stack:** Ethereum (Sepolia) · Solidity · React.js · Ethers.js · Node.js · Express.js · IPFS · Docker · Tailwind CSS
+
+## 🐳 Quick Start (Docker)
 
 ### Prerequisites
-- Docker & Docker Compose installed
-- MetaMask Browser Extension
+- Docker & Docker Compose
+- MetaMask browser extension
 
-### Quick Start
-1. **Navigate to the project root**:
-   ```bash
-   cd "did app/mydid"
-   ```
-2. **Setup Environment**:
-   Ensure you have a `.env` file in `src/backend/` (see `src/backend/.env.example`).
-3. **Run with Docker Compose**:
-   ```bash
-   docker-compose up -d --build
-   ```
-4. **Access the App**:
-   - Frontend: [http://localhost:3000](http://localhost:3000)
-   - Backend: [http://localhost:5000](http://localhost:5000)
+```bash
+# 1. Navigate to the project root
+cd "did app/mydid"
 
-### 🔒 Security Note
-This Docker setup **does NOT** store or access your MetaMask private keys. All blockchain transaction signing happens strictly in your **browser** via the MetaMask extension. The backend only handles public data verification and IPFS storage.
+# 2. Set up environment (see src/backend/.env.example)
+cp src/backend/.env.example src/backend/.env
+
+# 3. Build and run
+docker-compose up -d --build
+```
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:5000 |
+
+## 🔒 Security Model
+
+This setup **never stores or accesses MetaMask private keys**. All blockchain transaction signing happens strictly in the browser via the MetaMask extension. The backend handles only public data verification and IPFS storage.
+
+## 🧪 Local Development (without Docker)
+
+```bash
+# Frontend
+npm install
+npm start          # http://localhost:3000
+
+# Backend
+cd src/backend
+npm install
+npm run dev        # http://localhost:5000
+```
+
+## 👥 Team Project
+
+Built as a team project (2024–2025). My contributions: Ethereum smart-contract integration, wallet authentication and DID resolution workflows, responsive React + Tailwind frontend, IPFS credential handling, and Docker containerization.
 
 ---
 
-# Getting Started with Create React App
-
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Author:** [Parthiv A M](https://github.com/Paaarthiv) · [LinkedIn](https://www.linkedin.com/in/parthivam)
