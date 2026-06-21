@@ -2,6 +2,8 @@
 const express = require("express");
 const QRCode = require("qrcode");
 const { retrieveJSONFromIPFS, uploadJSONToPinata } = require("../utils/ipfs");
+const { requireAuth } = require("../utils/auth");
+const { getAllMessages, getDisclosedProofMessages, encodeMessages } = require("../utils/bbsMessages");
 
 module.exports = (loggedInUsers, bbsLib) => {
   const router = express.Router();
@@ -38,7 +40,7 @@ module.exports = (loggedInUsers, bbsLib) => {
 
     } catch (err) {
       console.error("❌ Error fetching VC:", err);
-      res.status(500).json({
+      res.status(err.statusCode || 500).json({
         success: false,
         message: err.message || "Unable to fetch VC from IPFS"
       });
@@ -49,7 +51,7 @@ module.exports = (loggedInUsers, bbsLib) => {
    * POST /generateProof - Generate selective disclosure proof
    * Uses BBS+ signatures to create a proof with only selected fields
    */
-  router.post("/generateProof", async (req, res) => {
+  router.post("/generateProof", requireAuth("holder"), async (req, res) => {
     try {
       const { vc, selectedFields, publicKey } = req.body;
 
@@ -66,6 +68,11 @@ module.exports = (loggedInUsers, bbsLib) => {
       if (!bbsLib) {
         throw new Error("BBS+ library not initialized");
       }
+
+      const fieldsToDisclose = [...new Set([
+        ...selectedFields,
+        ...(vc.credentialSubject?.documentHash ? ["documentHash"] : [])
+      ])];
 
       // Extract the original signature from VC
       const originalSignature = vc.proof?.proofValue;
@@ -84,93 +91,25 @@ module.exports = (loggedInUsers, bbsLib) => {
         throw new Error("Public key is required for proof generation");
       }
 
-      // Prepare messages in the same order as signing
+      // Prepare messages in the same canonical order used for signing.
       const credentialSubject = vc.credentialSubject || {};
-      const vcType = vc.type?.includes("AcademicCertificate") ? "AcademicCertificate" : "StudentID";
-      
-      console.log(`   Credential type: ${vcType}`);
-      
-      let allMessages;
-      let fieldMapping;
-      
-      if (vcType === "AcademicCertificate") {
-        // Academic Certificate message order (must match vcRoutes.js lines 201-216)
-        allMessages = [
-          credentialSubject.name || "",
-          credentialSubject.registerNumber || "",
-          credentialSubject.degree || "",
-          credentialSubject.branch || "",
-          credentialSubject.university || "",
-          credentialSubject.location || "",
-          credentialSubject.cgpa || "",
-          credentialSubject.class || "",
-          credentialSubject.examHeldIn || "",
-          credentialSubject.issuedDate || "",
-          credentialSubject.id || "",
-          vc.issuer || "",
-          vc.issuanceDate || "",
-          credentialSubject.documentHash || ""
-        ];
-        
-        fieldMapping = {
-          'name': 0,
-          'registerNumber': 1,
-          'degree': 2,
-          'branch': 3,
-          'university': 4,
-          'location': 5,
-          'cgpa': 6,
-          'class': 7,
-          'examHeldIn': 8,
-          'issuedDate': 9,
-          'id': 10,
-          'issuer': 11,
-          'issuanceDate': 12,
-          'documentHash': 13
-        };
-      } else {
-        // Student ID message order (must match vcRoutes.js lines 218-227)
-        allMessages = [
-          credentialSubject.name || "",
-          credentialSubject.rollNumber || "",
-          credentialSubject.dateOfBirth || "",
-          credentialSubject.department || "",
-          credentialSubject.id || "",
-          vc.issuer?.id || "",
-          vc.issuanceDate || "",
-          credentialSubject.documentHash || ""
-        ];
-        
-        fieldMapping = {
-          'name': 0,
-          'rollNumber': 1,
-          'dateOfBirth': 2,
-          'department': 3,
-          'id': 4,
-          'issuer': 5,
-          'issuanceDate': 6,
-          'documentHash': 7
-        };
-      }
+      const allMessages = getAllMessages(vc);
+      const {
+        disclosedFields,
+        disclosedIndexes
+      } = getDisclosedProofMessages(vc, fieldsToDisclose);
 
       console.log(`   Total messages: ${allMessages.length}`);
-      
-      // Convert messages to Uint8Array
-      const encoder = new TextEncoder();
-      const messageBytes = allMessages.map(m => encoder.encode(String(m)));
+      const messageBytes = encodeMessages(allMessages);
 
-      const disclosedIndices = selectedFields
-        .map(field => fieldMapping[field])
-        .filter(idx => idx !== undefined);
-
-      console.log(`   Disclosing indices: [${disclosedIndices.join(', ')}]`);
+      console.log(`   Disclosing indices: [${disclosedIndexes.join(', ')}]`);
 
       // Generate derived proof with correct ciphersuite
       const derivedProof = await bbsLib.deriveProof({
         signature: signatureBytes,
         publicKey: publicKeyBytes,
         messages: messageBytes,
-        disclosedMessageIndexes: disclosedIndices,
+        disclosedMessageIndexes: disclosedIndexes,
         header: new Uint8Array(),
         presentationHeader: new Uint8Array(),
         ciphersuite: bbsLib.CIPHERSUITES.BLS12381_SHA256
@@ -181,16 +120,11 @@ module.exports = (loggedInUsers, bbsLib) => {
 
       // Create presentation document with only disclosed fields
       const disclosedCredentialSubject = {};
-      selectedFields.forEach(field => {
+      disclosedFields.forEach(field => {
         if (credentialSubject[field] !== undefined) {
           disclosedCredentialSubject[field] = credentialSubject[field];
         }
       });
-      
-      // Always include documentHash for blockchain verification (not disclosed to user)
-      if (credentialSubject.documentHash) {
-        disclosedCredentialSubject.documentHash = credentialSubject.documentHash;
-      }
 
       const presentation = {
         "@context": vc["@context"],
@@ -204,7 +138,7 @@ module.exports = (loggedInUsers, bbsLib) => {
             proofPurpose: "assertionMethod",
             verificationMethod: vc.proof.verificationMethod,
             proofValue: Buffer.from(derivedProof).toString('base64'),
-            disclosedFields: selectedFields,
+            disclosedFields: disclosedFields,
             originalCID: req.body.originalCID || null
           }
         },
@@ -213,7 +147,7 @@ module.exports = (loggedInUsers, bbsLib) => {
           created: new Date().toISOString(),
           proofPurpose: "authentication",
           challenge: Math.random().toString(36).substring(7),
-          disclosedFields: selectedFields
+          disclosedFields: disclosedFields
         }
       };
 
@@ -227,7 +161,7 @@ module.exports = (loggedInUsers, bbsLib) => {
       const qrData = JSON.stringify({
         cid: proofUpload.cid,
         type: "SelectiveDisclosureProof",
-        disclosedFields: selectedFields
+        disclosedFields: disclosedFields
       });
 
       const qrCode = await QRCode.toDataURL(qrData, {
@@ -246,7 +180,7 @@ module.exports = (loggedInUsers, bbsLib) => {
         proofCid: proofUpload.cid,
         proofUrl: proofUpload.ipfsUrl,
         qrCode: qrCode,
-        selectedFields: selectedFields,
+        selectedFields: disclosedFields,
         presentation: presentation,
         disclosedData: disclosedCredentialSubject
       });
@@ -298,14 +232,9 @@ module.exports = (loggedInUsers, bbsLib) => {
         throw new Error("Public key is required for verification");
       }
 
-      // Prepare disclosed messages
       const disclosedFields = proof.disclosedFields || [];
-      const credentialSubject = vc.credentialSubject || {};
-
-      const disclosedMessages = disclosedFields.map(field => {
-        const value = credentialSubject[field] || "";
-        return new TextEncoder().encode(value);
-      });
+      const { disclosedIndexes, disclosedMessages } = getDisclosedProofMessages(vc, disclosedFields);
+      const messageBytes = encodeMessages(disclosedMessages);
 
       console.log(`   Disclosed fields: ${disclosedFields.join(', ')}`);
 
@@ -313,7 +242,8 @@ module.exports = (loggedInUsers, bbsLib) => {
       const verified = await bbsLib.verifyProof({
         proof: proofBytes,
         publicKey: publicKeyBytes,
-        messages: disclosedMessages,
+        disclosedMessages: messageBytes,
+        disclosedMessageIndexes: disclosedIndexes,
         header: new Uint8Array(),
         presentationHeader: new Uint8Array(),
         ciphersuite: bbsLib.CIPHERSUITES.BLS12381_SHA256
@@ -325,7 +255,7 @@ module.exports = (loggedInUsers, bbsLib) => {
         success: true,
         verified: verified,
         disclosedFields: disclosedFields,
-        disclosedData: credentialSubject,
+        disclosedData: vc.credentialSubject || {},
         presentation: presentation
       });
 

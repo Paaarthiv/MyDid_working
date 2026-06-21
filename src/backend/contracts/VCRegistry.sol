@@ -23,6 +23,9 @@ contract VCRegistry {
     uint256 public vcCount;
     mapping(uint256 => string) public vcIdToHash;
     
+    // Mapping from issuer address to their VC document hashes (for gas-efficient lookups)
+    mapping(address => string[]) private issuerVCs;
+    
     // Events
     event VCStored(
         uint256 indexed vcId,
@@ -65,6 +68,7 @@ contract VCRegistry {
         });
         
         vcIdToHash[vcId] = documentHash;
+        issuerVCs[msg.sender].push(documentHash);
         
         emit VCStored(vcId, documentHash, ipfsCID, msg.sender, block.timestamp);
         
@@ -161,27 +165,6 @@ contract VCRegistry {
         view
         returns (string[] memory hashes)
     {
-        uint256 count = 0;
-        
-        // Count VCs by this issuer
-        for (uint256 i = 1; i <= vcCount; i++) {
-            string memory hash = vcIdToHash[i];
-            if (vcRegistry[hash].issuer == issuerAddress) {
-                count++;
-            }
-        }
-        
-        // Populate array
-        hashes = new string[](count);
-        uint256 index = 0;
-        for (uint256 i = 1; i <= vcCount; i++) {
-            string memory hash = vcIdToHash[i];
-            if (vcRegistry[hash].issuer == issuerAddress) {
-                hashes[index] = hash;
-                index++;
-            }
-        }
-        
-        return hashes;
+        return issuerVCs[issuerAddress];
     }
 }

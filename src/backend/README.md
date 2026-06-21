@@ -438,7 +438,7 @@ Verify a selective disclosure proof
 - **Express.js** - Web framework
 - **Ethers.js v6** - Ethereum interaction
 - **@digitalbazaar/bbs-signatures** - BBS+ signatures (Node v20+ compatible)
-- **@pinata/sdk** - IPFS integration
+- **Axios/FormData** - Direct Pinata IPFS API integration
 - **Hardhat** - Smart contract development
 - **Multer** - File upload handling
 - **dotenv** - Environment configuration

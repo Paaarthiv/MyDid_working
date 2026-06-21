@@ -4,7 +4,6 @@ const fs = require("fs");
 const path = require("path");
 
 let provider = null;
-let wallet = null;
 let vcContract = null;
 
 /**
@@ -26,19 +25,12 @@ async function initializeBlockchain() {
       throw new Error("No RPC provider configured (INFURA_API_KEY or ALCHEMY_API_KEY)");
     }
 
-    // Setup wallet
-    const privateKey = process.env.WALLET_PRIVATE_KEY;
-    if (!privateKey) {
-      throw new Error("WALLET_PRIVATE_KEY not configured in .env");
-    }
 
-    wallet = new ethers.Wallet(privateKey, provider);
-    console.log(`✅ Wallet initialized: ${wallet.address}`);
 
     // Load contract
     const contractAddress = process.env.VC_CONTRACT_ADDRESS;
-    if (!contractAddress) {
-      console.warn("⚠️ VC_CONTRACT_ADDRESS not set - blockchain features disabled");
+    if (!contractAddress || contractAddress === "your_contract_address_here") {
+      console.warn("⚠️ Valid VC_CONTRACT_ADDRESS not set - blockchain features disabled");
       return;
     }
 
@@ -62,8 +54,8 @@ async function initializeBlockchain() {
       ];
     }
 
-    vcContract = new ethers.Contract(contractAddress, abi, wallet);
-    console.log(`✅ VC Registry contract loaded at: ${contractAddress}`);
+    vcContract = new ethers.Contract(contractAddress, abi, provider);
+    console.log(`✅ Read-only VC Registry contract loaded at: ${contractAddress}`);
 
   } catch (error) {
     console.error("❌ Blockchain initialization error:", error.message);
@@ -73,51 +65,10 @@ async function initializeBlockchain() {
 
 /**
  * Store VC metadata on blockchain
- * @param {string} documentHash - SHA-256 hash of document
- * @param {string} ipfsCID - IPFS CID of VC JSON
- * @returns {Promise<{txHash: string, vcId: number}>}
+ * Note: This should now be handled by the frontend via MetaMask!
  */
 async function storeVCOnChain(documentHash, ipfsCID) {
-  try {
-    if (!vcContract) {
-      throw new Error("VC contract not initialized");
-    }
-
-    console.log(`📤 Storing VC on blockchain...`);
-    console.log(`   Hash: ${documentHash}`);
-    console.log(`   CID: ${ipfsCID}`);
-
-    const tx = await vcContract.storeVC(documentHash, ipfsCID);
-    console.log(`⏳ Transaction submitted: ${tx.hash}`);
-    
-    const receipt = await tx.wait();
-    console.log(`✅ Transaction confirmed in block ${receipt.blockNumber}`);
-
-    // Extract vcId from event logs
-    let vcId = null;
-    if (receipt.logs && receipt.logs.length > 0) {
-      try {
-        const event = receipt.logs.find(log => log.topics[0] === vcContract.interface.getEvent("VCStored").topicHash);
-        if (event) {
-          const parsed = vcContract.interface.parseLog(event);
-          vcId = parsed.args.vcId.toString();
-        }
-      } catch (e) {
-        console.warn("⚠️ Could not parse vcId from event");
-      }
-    }
-
-    return {
-      txHash: receipt.hash,
-      blockNumber: receipt.blockNumber,
-      vcId: vcId,
-      gasUsed: receipt.gasUsed.toString()
-    };
-
-  } catch (error) {
-    console.error("❌ Error storing VC on blockchain:", error);
-    throw new Error(`Blockchain storage failed: ${error.message}`);
-  }
+  throw new Error("Backend should not store VCs on chain. Use MetaMask on frontend.");
 }
 
 /**
@@ -154,33 +105,10 @@ async function verifyVCOnChain(documentHash) {
 
 /**
  * Revoke VC on blockchain
- * @param {string} documentHash - SHA-256 hash to revoke
- * @returns {Promise<{txHash: string}>}
+ * Note: This should now be handled by the frontend via MetaMask!
  */
 async function revokeVCOnChain(documentHash) {
-  try {
-    if (!vcContract) {
-      throw new Error("VC contract not initialized");
-    }
-
-    console.log(`🚫 Revoking VC on blockchain: ${documentHash}`);
-
-    const tx = await vcContract.revokeVC(documentHash);
-    console.log(`⏳ Revocation transaction submitted: ${tx.hash}`);
-    
-    const receipt = await tx.wait();
-    console.log(`✅ Revocation confirmed in block ${receipt.blockNumber}`);
-
-    return {
-      txHash: receipt.hash,
-      blockNumber: receipt.blockNumber,
-      gasUsed: receipt.gasUsed.toString()
-    };
-
-  } catch (error) {
-    console.error("❌ Error revoking VC on blockchain:", error);
-    throw new Error(`Blockchain revocation failed: ${error.message}`);
-  }
+  throw new Error("Backend should not revoke VCs on chain. Use MetaMask on frontend.");
 }
 
 /**
@@ -188,26 +116,11 @@ async function revokeVCOnChain(documentHash) {
  * @returns {Promise<string>}
  */
 async function getWalletBalance() {
-  try {
-    if (!wallet || !provider) {
-      throw new Error("Wallet not initialized");
-    }
-
-    const balance = await provider.getBalance(wallet.address);
-    const balanceInEth = ethers.formatEther(balance);
-    return balanceInEth;
-  } catch (error) {
-    console.error("❌ Error getting wallet balance:", error);
-    return "0";
-  }
+  return "N/A (Read-only)";
 }
 
-/**
- * Check if blockchain is ready
- * @returns {boolean}
- */
 function isBlockchainReady() {
-  return !!(provider && wallet && vcContract);
+  return !!(provider && vcContract);
 }
 
 module.exports = {

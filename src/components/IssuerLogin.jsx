@@ -29,14 +29,15 @@ function IssuerLogin() {
             const message = "Login to DID App as Issuer";
             const signature = await signer.signMessage(message);
 
-            const response = await axios.post("http://localhost:5000/login", {
+            const response = await axios.post("/login", {
               address,
               message,
               signature,
+              role: "issuer",
             });
 
             if (response.data.success) {
-              login(address, did, publicKey, "issuer");
+              login(address, did, publicKey, "issuer", response.data.token);
               navigate("/issuer-dashboard");
             }
           }
@@ -58,14 +59,15 @@ function IssuerLogin() {
     const message = "Login to DID App as Issuer";
     const signature = await signer.signMessage(message);
 
-    const response = await axios.post("http://localhost:5000/login", {
+    const response = await axios.post("/login", {
       address,
       message,
       signature,
+      role: "issuer",
     });
 
     if (response.data.success) {
-      login(address, did, publicKey, "issuer");
+      login(address, did, publicKey, "issuer", response.data.token);
       navigate("/issuer-dashboard");
     }
   };

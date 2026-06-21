@@ -1,71 +1,159 @@
 /**
  * Nonce Management Utilities
  * Handles cryptographic nonce generation, storage, and verification
- * for DID ownership proof via challenge-response
+ * for DID ownership proof via challenge-response using SQLite
  */
 
 const crypto = require('crypto');
-const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
-// File paths for persistent storage
+// File paths
 const DATA_DIR = path.join(__dirname, '../data');
-const NONCES_FILE = path.join(DATA_DIR, 'nonces.json');
-const PENDING_REQUESTS_FILE = path.join(DATA_DIR, 'pendingRequests.json');
+const DB_FILE = path.join(DATA_DIR, 'challenge.sqlite');
+const OLD_NONCES_FILE = path.join(DATA_DIR, 'nonces.json');
+const OLD_PENDING_FILE = path.join(DATA_DIR, 'pendingRequests.json');
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// In-memory storage (backed by files)
-let nonces = {};
-let pendingRequests = {};
+// Initialize SQLite database
+const db = new sqlite3.Database(DB_FILE, (err) => {
+  if (err) {
+    console.error('❌ Error opening challenge database:', err.message);
+  } else {
+    db.serialize(() => {
+      // Enable Foreign Keys and WAL mode for better concurrency
+      db.run('PRAGMA foreign_keys = ON');
+      db.run('PRAGMA journal_mode = WAL');
 
-// Load data from files on startup
-function loadData() {
-  try {
-    if (fs.existsSync(NONCES_FILE)) {
-      const data = fs.readFileSync(NONCES_FILE, 'utf8');
-      nonces = JSON.parse(data);
-      console.log('✅ Loaded nonces from file');
+      // Create pendingRequests table
+      db.run(`CREATE TABLE IF NOT EXISTS pending_requests (
+        requestId TEXT PRIMARY KEY,
+        holderDID TEXT,
+        holderAddress TEXT,
+        holderName TEXT,
+        vcType TEXT,
+        verificationID TEXT,
+        message TEXT,
+        status TEXT,
+        createdAt TEXT,
+        nonceId TEXT,
+        verifiedAt TEXT,
+        signature TEXT,
+        recoveredAddress TEXT,
+        attachedStudentVC TEXT,
+        issuedVCCID TEXT,
+        approvedBy TEXT,
+        approvedAt TEXT,
+        rejectionReason TEXT,
+        rejectedBy TEXT,
+        rejectedAt TEXT,
+        updatedAt TEXT
+      )`);
+
+      // Create nonces table
+      db.run(`CREATE TABLE IF NOT EXISTS nonces (
+        nonceId TEXT PRIMARY KEY,
+        nonce TEXT,
+        requestId TEXT,
+        holderDID TEXT,
+        messageToSign TEXT,
+        expiresAt TEXT,
+        used INTEGER DEFAULT 0,
+        createdAt TEXT,
+        usedAt TEXT,
+        signature TEXT,
+        FOREIGN KEY (requestId) REFERENCES pending_requests(requestId) ON DELETE CASCADE
+      )`, () => {
+        // Run migration only after tables are created
+        migrateOldData();
+      });
+    });
+  }
+});
+
+// Promise wrappers for SQLite
+const dbRun = (query, params = []) => new Promise((resolve, reject) => {
+  db.run(query, params, function(err) {
+    if (err) reject(err);
+    else resolve(this);
+  });
+});
+
+const dbGet = (query, params = []) => new Promise((resolve, reject) => {
+  db.get(query, params, (err, row) => {
+    if (err) reject(err);
+    else resolve(row);
+  });
+});
+
+const dbAll = (query, params = []) => new Promise((resolve, reject) => {
+  db.all(query, params, (err, rows) => {
+    if (err) reject(err);
+    else resolve(rows);
+  });
+});
+
+// Helper to parse JSON from DB
+const parseRequestRow = (row) => {
+  if (!row) return null;
+  const parsed = { ...row };
+  if (parsed.attachedStudentVC) {
+    try {
+      parsed.attachedStudentVC = JSON.parse(parsed.attachedStudentVC);
+    } catch (e) {
+      parsed.attachedStudentVC = null;
     }
-  } catch (error) {
-    console.error('⚠️ Error loading nonces:', error.message);
-    nonces = {};
   }
+  return parsed;
+};
 
+// Migrate old JSON data
+async function migrateOldData() {
   try {
-    if (fs.existsSync(PENDING_REQUESTS_FILE)) {
-      const data = fs.readFileSync(PENDING_REQUESTS_FILE, 'utf8');
-      pendingRequests = JSON.parse(data);
-      console.log('✅ Loaded pending requests from file');
+    const { count } = await dbGet('SELECT COUNT(*) as count FROM pending_requests');
+    if (count === 0 && fs.existsSync(OLD_PENDING_FILE)) {
+      console.log('🔄 Migrating pendingRequests.json to SQLite...');
+      const pendingData = JSON.parse(fs.readFileSync(OLD_PENDING_FILE, 'utf8'));
+      
+      const insertReq = db.prepare(`INSERT INTO pending_requests 
+        (requestId, holderDID, holderAddress, holderName, vcType, verificationID, message, status, createdAt, nonceId, verifiedAt, signature, recoveredAddress, attachedStudentVC, issuedVCCID, approvedBy, approvedAt, rejectionReason, rejectedBy, rejectedAt, updatedAt) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+      
+      for (const [id, req] of Object.entries(pendingData)) {
+        insertReq.run(
+          id, req.holderDID, req.holderAddress, req.holderName, req.vcType, req.verificationID, req.message, req.status, req.createdAt, req.nonceId, req.verifiedAt, req.signature, req.recoveredAddress, 
+          req.attachedStudentVC ? JSON.stringify(req.attachedStudentVC) : null,
+          req.issuedVCCID, req.approvedBy, req.approvedAt, req.rejectionReason, req.rejectedBy, req.rejectedAt, req.updatedAt
+        );
+      }
+      insertReq.finalize();
+      console.log('✅ Migrated pending requests');
     }
-  } catch (error) {
-    console.error('⚠️ Error loading pending requests:', error.message);
-    pendingRequests = {};
-  }
-}
 
-// Save data to files
-function saveNonces() {
-  try {
-    fs.writeFileSync(NONCES_FILE, JSON.stringify(nonces, null, 2));
-    return true;
-  } catch (error) {
-    console.error('❌ Error saving nonces:', error.message);
-    return false;
-  }
-}
-
-function savePendingRequests() {
-  try {
-    fs.writeFileSync(PENDING_REQUESTS_FILE, JSON.stringify(pendingRequests, null, 2));
-    return true;
-  } catch (error) {
-    console.error('❌ Error saving pending requests:', error.message);
-    return false;
+    const { count: nonceCount } = await dbGet('SELECT COUNT(*) as count FROM nonces');
+    if (nonceCount === 0 && fs.existsSync(OLD_NONCES_FILE)) {
+      console.log('🔄 Migrating nonces.json to SQLite...');
+      const noncesData = JSON.parse(fs.readFileSync(OLD_NONCES_FILE, 'utf8'));
+      
+      const insertNonce = db.prepare(`INSERT INTO nonces 
+        (nonceId, nonce, requestId, holderDID, messageToSign, expiresAt, used, createdAt, usedAt, signature) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+      
+      for (const [id, n] of Object.entries(noncesData)) {
+        insertNonce.run(
+          id, n.nonce, n.requestId, n.holderDID, n.messageToSign, n.expiresAt, n.used ? 1 : 0, n.createdAt, n.usedAt, n.signature
+        );
+      }
+      insertNonce.finalize();
+      console.log('✅ Migrated nonces');
+    }
+  } catch (err) {
+    console.error('❌ Error migrating JSON to SQLite:', err);
   }
 }
 
@@ -75,220 +163,144 @@ function generateNonce(bytes = 32) {
 }
 
 // Create a new pending request
-function createPendingRequest(holderDID, holderAddress, holderName, vcType, verificationID, message, attachedStudentVC) {
-  const requestId = uuidv4();
+async function createPendingRequest(holderDID, holderAddress, holderName, vcType, verificationID, message, attachedStudentVC) {
+  const requestId = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
   
-  const request = {
-    requestId,
-    holderDID,
-    holderAddress,
-    holderName: holderName || 'Unknown',
-    vcType,
-    verificationID,
-    message,
-    status: 'pending', // pending, verified, rejected
-    createdAt: new Date().toISOString(),
-    nonceId: null,
-    verifiedAt: null,
-    signature: null,
-    recoveredAddress: null
-  };
-
-  // Add attached Student ID VC if present (for Academic Certificate requests)
-  if (attachedStudentVC) {
-    request.attachedStudentVC = attachedStudentVC;
-    console.log(`🔗 Attached Student ID VC with CID: ${attachedStudentVC.cid}`);
-  }
-
-  pendingRequests[requestId] = request;
-  savePendingRequests();
+  await dbRun(`INSERT INTO pending_requests 
+    (requestId, holderDID, holderAddress, holderName, vcType, verificationID, message, status, createdAt, attachedStudentVC)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+    [requestId, holderDID, holderAddress, holderName || 'Unknown', vcType, verificationID, message || '', 'pending', createdAt, attachedStudentVC ? JSON.stringify(attachedStudentVC) : null]
+  );
+  
   console.log(`✅ Created pending request: ${requestId}`);
-  
   return requestId;
 }
 
 // Create a challenge nonce for a request
-function createChallenge(requestId) {
-  const request = pendingRequests[requestId];
+async function createChallenge(requestId) {
+  const request = await getPendingRequest(requestId);
   
-  if (!request) {
-    throw new Error('Request not found');
-  }
+  if (!request) throw new Error('Request not found');
+  if (request.status !== 'pending') throw new Error(`Request is already ${request.status}`);
 
-  if (request.status !== 'pending') {
-    throw new Error(`Request is already ${request.status}`);
-  }
-
-  const nonceId = uuidv4();
+  const nonceId = crypto.randomUUID();
   const nonce = generateNonce(32);
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 minutes
 
   // Create message to sign
-  const messageToSign = `DigiLocker DID Ownership Proof\n\nNonce: ${nonce}\nRequest ID: ${requestId}\nAction: Prove DID Ownership\nExpires: ${expiresAt.toISOString()}\n\nSign this message to verify you own: ${request.holderDID}`;
+  const messageToSign = `DigiLocker DID Ownership Proof\n\nNonce: ${nonce}\nRequest ID: ${requestId}\nAction: Prove DID Ownership\nExpires: ${expiresAt}\n\nSign this message to verify you own: ${request.holderDID}`;
 
-  nonces[nonceId] = {
-    nonceId,
-    nonce,
-    requestId,
-    holderDID: request.holderDID,
-    messageToSign,
-    expiresAt: expiresAt.toISOString(),
-    used: false,
-    createdAt: new Date().toISOString()
-  };
+  await dbRun(`INSERT INTO nonces 
+    (nonceId, nonce, requestId, holderDID, messageToSign, expiresAt, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [nonceId, nonce, requestId, request.holderDID, messageToSign, expiresAt, new Date().toISOString()]
+  );
 
   // Link nonce to request
-  pendingRequests[requestId].nonceId = nonceId;
-
-  saveNonces();
-  savePendingRequests();
+  await dbRun(`UPDATE pending_requests SET nonceId = ? WHERE requestId = ?`, [nonceId, requestId]);
 
   console.log(`✅ Created challenge nonce: ${nonceId} for request: ${requestId}`);
-
-  return {
-    nonceId,
-    nonce,
-    messageToSign,
-    expiresAt: expiresAt.toISOString()
-  };
+  return { nonceId, nonce, messageToSign, expiresAt };
 }
 
 // Verify a challenge response
-function verifyChallenge(requestId, nonceId, signature, recoveredAddress) {
-  const request = pendingRequests[requestId];
-  const nonceData = nonces[nonceId];
+async function verifyChallenge(requestId, nonceId, signature, recoveredAddress) {
+  const request = await getPendingRequest(requestId);
+  const nonceData = await dbGet(`SELECT * FROM nonces WHERE nonceId = ?`, [nonceId]);
 
-  // Validate nonce exists
-  if (!nonceData) {
-    throw new Error('Nonce not found');
-  }
+  if (!nonceData) throw new Error('Nonce not found');
+  if (!request) throw new Error('Request not found');
+  if (nonceData.requestId !== requestId) throw new Error('Nonce does not match request');
+  if (new Date() > new Date(nonceData.expiresAt)) throw new Error('Nonce has expired');
+  if (nonceData.used) throw new Error('Nonce has already been used');
 
-  // Validate request exists
-  if (!request) {
-    throw new Error('Request not found');
-  }
-
-  // Validate nonce matches request
-  if (nonceData.requestId !== requestId) {
-    throw new Error('Nonce does not match request');
-  }
-
-  // Validate nonce not expired
-  if (new Date() > new Date(nonceData.expiresAt)) {
-    throw new Error('Nonce has expired');
-  }
-
-  // Validate nonce not already used
-  if (nonceData.used) {
-    throw new Error('Nonce has already been used');
-  }
-
-  // Validate DID ownership
-  // Extract address from DID (format: did:ethr:0x...)
   const didAddress = request.holderDID.split(':')[2];
-  
-  if (!didAddress) {
-    throw new Error('Invalid DID format');
-  }
+  if (!didAddress) throw new Error('Invalid DID format');
+  if (recoveredAddress.toLowerCase() !== didAddress.toLowerCase()) throw new Error('Signature does not match DID owner');
 
-  // Compare addresses (case-insensitive)
-  if (recoveredAddress.toLowerCase() !== didAddress.toLowerCase()) {
-    throw new Error('Signature does not match DID owner');
-  }
-
-  // Mark nonce as used (atomically)
-  nonceData.used = true;
-  nonceData.usedAt = new Date().toISOString();
-  nonceData.signature = signature;
-
-  // Mark request as verified
-  request.status = 'verified';
-  request.verifiedAt = new Date().toISOString();
-  request.signature = signature;
-  request.recoveredAddress = recoveredAddress;
-
-  // Save changes
-  saveNonces();
-  savePendingRequests();
+  // Transaction-like update
+  const now = new Date().toISOString();
+  await dbRun(`UPDATE nonces SET used = 1, usedAt = ?, signature = ? WHERE nonceId = ?`, [now, signature, nonceId]);
+  await dbRun(`UPDATE pending_requests SET status = 'verified', verifiedAt = ?, signature = ?, recoveredAddress = ? WHERE requestId = ?`, 
+    [now, signature, recoveredAddress, requestId]
+  );
 
   console.log(`✅ Challenge verified for request: ${requestId}`);
-
   return true;
 }
 
 // Get pending request by ID
-function getPendingRequest(requestId) {
-  return pendingRequests[requestId] || null;
+async function getPendingRequest(requestId) {
+  const row = await dbGet(`SELECT * FROM pending_requests WHERE requestId = ?`, [requestId]);
+  return parseRequestRow(row);
 }
 
 // Get all pending requests
-function getAllPendingRequests() {
-  return Object.values(pendingRequests);
+async function getAllPendingRequests() {
+  const rows = await dbAll(`SELECT * FROM pending_requests ORDER BY createdAt DESC`);
+  return rows.map(parseRequestRow);
 }
 
 // Get verified requests only
-function getVerifiedRequests() {
-  return Object.values(pendingRequests).filter(req => req.status === 'verified');
+async function getVerifiedRequests() {
+  const rows = await dbAll(`SELECT * FROM pending_requests WHERE status = 'verified' ORDER BY createdAt DESC`);
+  return rows.map(parseRequestRow);
 }
 
 // Get requests by holder address
-function getRequestsByHolder(holderAddress) {
-  return Object.values(pendingRequests).filter(req => req.holderAddress === holderAddress);
+async function getRequestsByHolder(holderAddress) {
+  const rows = await dbAll(`SELECT * FROM pending_requests WHERE holderAddress = ? ORDER BY createdAt DESC`, [holderAddress]);
+  return rows.map(parseRequestRow);
 }
 
 // Update request status (for approval/rejection by issuer)
-function updateRequestStatus(requestId, status, additionalData = {}) {
-  const request = pendingRequests[requestId];
-  
-  if (!request) {
-    throw new Error('Request not found');
+async function updateRequestStatus(requestId, status, additionalData = {}) {
+  const request = await getPendingRequest(requestId);
+  if (!request) throw new Error('Request not found');
+
+  let query = `UPDATE pending_requests SET status = ?, updatedAt = ?`;
+  let params = [status, new Date().toISOString()];
+
+  const updatableFields = [
+    'issuedVCCID', 'approvedBy', 'approvedAt', 
+    'rejectionReason', 'rejectedBy', 'rejectedAt'
+  ];
+
+  for (const field of updatableFields) {
+    if (additionalData[field] !== undefined) {
+      query += `, ${field} = ?`;
+      params.push(additionalData[field]);
+    }
   }
 
-  request.status = status;
-  request.updatedAt = new Date().toISOString();
-  
-  // Merge additional data (e.g., issuedVCCID, rejectionReason)
-  Object.assign(request, additionalData);
+  query += ` WHERE requestId = ?`;
+  params.push(requestId);
 
-  savePendingRequests();
-  
-  return request;
+  await dbRun(query, params);
+  return await getPendingRequest(requestId);
 }
 
 // Cleanup expired nonces (run periodically)
-function cleanupExpiredNonces() {
-  const now = new Date();
-  let cleaned = 0;
-
-  Object.keys(nonces).forEach(nonceId => {
-    if (new Date(nonces[nonceId].expiresAt) < now) {
-      delete nonces[nonceId];
-      cleaned++;
-    }
-  });
-
-  if (cleaned > 0) {
-    saveNonces();
-    console.log(`🧹 Cleaned up ${cleaned} expired nonces`);
+async function cleanupExpiredNonces() {
+  const now = new Date().toISOString();
+  const result = await dbRun(`DELETE FROM nonces WHERE expiresAt < ?`, [now]);
+  if (result.changes > 0) {
+    console.log(`🧹 Cleaned up ${result.changes} expired nonces`);
   }
-
-  return cleaned;
+  return result.changes;
 }
 
 /**
  * Delete a pending request
  */
-function deletePendingRequest(requestId) {
+async function deletePendingRequest(requestId) {
   try {
-    if (!pendingRequests[requestId]) {
+    const result = await dbRun(`DELETE FROM pending_requests WHERE requestId = ?`, [requestId]);
+    if (result.changes === 0) {
       console.log(`⚠️ Request ${requestId} not found`);
       return { success: false, message: 'Request not found' };
     }
-
-    console.log(`🗑️ Deleting request: ${requestId}`);
-    delete pendingRequests[requestId];
-    savePendingRequests();
-    
     console.log(`✅ Request ${requestId} deleted successfully`);
     return { success: true, message: 'Request deleted successfully' };
   } catch (error) {
@@ -297,8 +309,10 @@ function deletePendingRequest(requestId) {
   }
 }
 
-// Initialize on module load
-loadData();
+// Get raw nonce by ID
+async function getNonceData(nonceId) {
+  return await dbGet(`SELECT * FROM nonces WHERE nonceId = ?`, [nonceId]);
+}
 
 // Cleanup expired nonces every 10 minutes
 setInterval(cleanupExpiredNonces, 10 * 60 * 1000);
@@ -314,5 +328,6 @@ module.exports = {
   updateRequestStatus,
   cleanupExpiredNonces,
   generateNonce,
-  deletePendingRequest
+  deletePendingRequest,
+  getNonceData
 };

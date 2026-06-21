@@ -1,8 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: {
+    relative: true,
+    files: [
+      "./public/index.html",
+      "./src/*.{js,jsx}",
+      "./src/components/*.{js,jsx}",
+      "./src/components/shared/*.{js,jsx}",
+      "./src/components/wallet/*.{js,jsx}",
+      "./src/context/*.{js,jsx}",
+      "./src/utils/*.js",
+    ],
+  },
   darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {

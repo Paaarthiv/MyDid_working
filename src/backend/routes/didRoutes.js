@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const path = require("path");
+const { requireAuth } = require("../utils/auth");
 
 // File paths for storing DID data
 const REGISTERED_HOLDERS_FILE = path.join(__dirname, "../data/registeredHolders.json");
@@ -172,7 +173,7 @@ router.get("/getRegisteredHolders", (req, res) => {
  * POST /linkVCToHolder
  * Link an issued VC (by CID) to a holder's DID
  */
-router.post("/linkVCToHolder", (req, res) => {
+router.post("/linkVCToHolder", requireAuth("issuer"), (req, res) => {
   try {
     const { holderDID, vcCID } = req.body;
 
@@ -315,7 +316,7 @@ router.get("/resolveDID/:did", (req, res) => {
  * DELETE /unregisterHolder/:address
  * Remove a holder's registration (optional cleanup)
  */
-router.delete("/unregisterHolder/:address", (req, res) => {
+router.delete("/unregisterHolder/:address", requireAuth(), (req, res) => {
   try {
     const { address } = req.params;
 

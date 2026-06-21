@@ -56,7 +56,7 @@ export default function VerifierDashboard() {
         publicKey: keyToVerify || 'none'
       });
 
-      const response = await axios.post("http://localhost:5000/verifyVC", {
+      const response = await axios.post("/verifyVC", {
         cid: cidToVerify,
         publicKey: keyToVerify || undefined
       });
@@ -108,12 +108,6 @@ export default function VerifierDashboard() {
     if (value === true) return "✅";
     if (value === false) return "❌";
     return "⚠️";
-  };
-
-  const getStatusColor = (value) => {
-    if (value === true) return "var(--color-success)";
-    if (value === false) return "var(--color-error)";
-    return "var(--color-warning)";
   };
 
   const truncate = (str, length = 40) => {

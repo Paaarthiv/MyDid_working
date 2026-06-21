@@ -1,51 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import "./VCForm.css";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import QRCode from "react-qr-code";
 
 function VCView() {
   const { vcData: vc } = useAuth();
-  const [shareUrl, setShareUrl] = useState("");
-  const [isSharing, setIsSharing] = useState(false);
-  const navigate = useNavigate();
 
   if (!vc || !vc.vc) 
     return <p style={{ textAlign: "center", marginTop: "50px" }}>No VC to display. Please issue a VC first.</p>;
 
   const subject = vc.vc.credentialSubject;
   const proof = vc.vc.proof;
-
-  const handleShareVC = () => {
-    setIsSharing(true);
-
-    const vcData = {
-      vc: vc.vc,
-      bbsPublicKey: vc.bbsPublicKey,
-      messageCount: vc.messageCount,
-      sharedAt: new Date().toISOString()
-    };
-
-    const encodedData = btoa(JSON.stringify(vcData));
-    const shareUrl = `${window.location.origin}/view-shared?data=${encodedData}`;
-
-    setShareUrl(shareUrl);
-    setIsSharing(false);
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert("Share URL copied to clipboard!");
-    }).catch(() => {
-      alert("Failed to copy URL. Please copy manually.");
-    });
-  };
-
-  // Helper to shorten the displayed link
-  const getShortUrl = (url) => {
-    if (url.length <= 50) return url;
-    return url.slice(0, 25) + "..." + url.slice(-20);
-  };
 
   return (
     <div className="vcview-container" style={{ position: "relative", minHeight: "100vh", paddingBottom: "100px" }}>

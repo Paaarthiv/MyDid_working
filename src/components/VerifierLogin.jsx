@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Wallet, User, Lock, Shield, CheckCircle, ArrowLeft } from "lucide-react";
+import { Wallet, Search, Shield, CheckCircle, Lock, ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import AnimatedPage from './shared/AnimatedPage';
 
-function HolderLogin() {
+function VerifierLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
@@ -16,7 +16,7 @@ function HolderLogin() {
   useEffect(() => {
     const checkAlreadyConnected = async () => {
       const savedRole = localStorage.getItem("userRole");
-      if (savedRole === "holder" && window.ethereum) {
+      if (savedRole === "verifier" && window.ethereum) {
         try {
           const provider = new ethers.BrowserProvider(window.ethereum);
           const accounts = await provider.send("eth_accounts", []);
@@ -26,18 +26,19 @@ function HolderLogin() {
             const publicKey = address;
             const did = `did:ethr:${address}`;
 
-            const message = "Login to DID App as Holder";
+            const message = "Login to DID App as Verifier";
             const signature = await signer.signMessage(message);
 
-            const response = await axios.post("http://localhost:5000/login", {
+            const response = await axios.post("/login", {
               address,
               message,
               signature,
+              role: "verifier",
             });
 
             if (response.data.success) {
-              login(address, did, publicKey, "holder");
-              navigate("/holder-dashboard");
+              login(address, did, publicKey, "verifier", response.data.token);
+              navigate("/verifier-dashboard");
             }
           }
         } catch (err) {
@@ -55,18 +56,19 @@ function HolderLogin() {
     const publicKey = address;
     const did = `did:ethr:${address}`;
 
-    const message = "Login to DID App as Holder";
+    const message = "Login to DID App as Verifier";
     const signature = await signer.signMessage(message);
 
-    const response = await axios.post("http://localhost:5000/login", {
+    const response = await axios.post("/login", {
       address,
       message,
       signature,
+      role: "verifier",
     });
 
     if (response.data.success) {
-      login(address, did, publicKey, "holder");
-      navigate("/holder-dashboard");
+      login(address, did, publicKey, "verifier", response.data.token);
+      navigate("/verifier-dashboard");
     }
   };
 
@@ -131,7 +133,7 @@ function HolderLogin() {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-navy-dark to-navy rounded-2xl shadow-2xl shadow-navy/50 mb-6"
             >
-              <User className="w-10 h-10 text-white" />
+              <Search className="w-10 h-10 text-white" />
             </motion.div>
 
             {/* Title */}
@@ -141,7 +143,7 @@ function HolderLogin() {
               transition={{ delay: 0.3 }}
               className="text-4xl font-bold mb-3 bg-gradient-to-r from-navy-dark to-navy dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent"
             >
-              Holder Portal
+              Verifier Portal
             </motion.h1>
 
             <motion.p
@@ -150,7 +152,7 @@ function HolderLogin() {
               transition={{ delay: 0.4 }}
               className="text-slate-600 dark:text-slate-400 mb-8"
             >
-              Manage your digital identity wallet
+              Verify credential authenticity
             </motion.p>
 
             {/* Features - Navy Mirage colors */}
@@ -161,9 +163,9 @@ function HolderLogin() {
               className="grid grid-cols-3 gap-4 mb-8"
             >
               {[
-                { icon: User, label: "Identity" },
-                { icon: Lock, label: "Private" },
-                { icon: Shield, label: "Secure" }
+                { icon: Search, label: "Verify" },
+                { icon: Shield, label: "Trusted" },
+                { icon: Lock, label: "Secure" }
               ].map((feature, index) => {
                 const Icon = feature.icon;
                 return (
@@ -233,11 +235,11 @@ function HolderLogin() {
           >
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-4 h-4 text-emerald-400" />
-              <span>Blockchain Secured</span>
+              <span>Blockchain Verified</span>
             </div>
             <div className="flex items-center space-x-2">
               <CheckCircle className="w-4 h-4 text-emerald-400" />
-              <span>BBS+ Signatures</span>
+              <span>BBS+ Proofs</span>
             </div>
           </motion.div>
         </motion.div>
@@ -246,4 +248,4 @@ function HolderLogin() {
   );
 }
 
-export default HolderLogin;
+export default VerifierLogin;

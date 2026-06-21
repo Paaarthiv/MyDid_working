@@ -21,7 +21,7 @@ function VCForm() {
   const fetchRegisteredHolders = async () => {
     try {
       setLoadingHolders(true);
-      const response = await axios.get("http://localhost:5000/getRegisteredHolders");
+      const response = await axios.get("/getRegisteredHolders");
       if (response.data.success) {
         setRegisteredHolders(response.data.holders);
       }
@@ -49,17 +49,44 @@ function VCForm() {
     data.append("holderDID", selectedHolder); // Add selected holder's DID
 
     try {
-      const response = await axios.post("http://localhost:5000/issueVC", data, {
+      const response = await axios.post("/issueVC", data, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
       console.log("VC Response:", response.data);
       
       // Link VC to holder
-      if (response.data.vc && response.data.vc.ipfsCID) {
-        await axios.post("http://localhost:5000/linkVCToHolder", {
+      if (response.data.vc && response.data.ipfs?.vcCID) {
+        const vcCID = response.data.ipfs.vcCID;
+        const documentHash = response.data.documentHash;
+
+        // Interact with MetaMask to anchor on blockchain
+        const contractAddress = import.meta.env.VITE_VC_CONTRACT_ADDRESS;
+        if (window.ethereum && contractAddress && documentHash && vcCID) {
+          try {
+            console.log('⛓️ Prompting MetaMask to anchor VC to blockchain...');
+            const { ethers } = await import("ethers");
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            
+            const abi = [
+              "function storeVC(string memory documentHash, string memory ipfsCID) public returns (uint256)"
+            ];
+            const vcContract = new ethers.Contract(contractAddress, abi, signer);
+            
+            const tx = await vcContract.storeVC(documentHash, vcCID);
+            console.log(`⏳ Transaction submitted: ${tx.hash}`);
+            await tx.wait();
+            console.log(`✅ VC anchored to blockchain!`);
+          } catch (blockchainError) {
+            console.error("⚠️ Blockchain anchoring failed (continuing anyway):", blockchainError);
+            alert("Warning: Blockchain anchoring failed or was rejected. The VC was still issued off-chain.");
+          }
+        }
+
+        await axios.post("/linkVCToHolder", {
           holderDID: selectedHolder,
-          vcCID: response.data.vc.ipfsCID
+          vcCID: vcCID
         });
       }
       

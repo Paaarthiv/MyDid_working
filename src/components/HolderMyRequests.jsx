@@ -13,22 +13,24 @@ export default function HolderMyRequests() {
     const [loadingRequests, setLoadingRequests] = useState(true);
 
     useEffect(() => {
-        fetchMyRequests();
-    }, [userAddress]);
-
-    const fetchMyRequests = async () => {
-        try {
-            setLoadingRequests(true);
-            const response = await axios.get(`http://localhost:5000/holder/myRequests/${userAddress}`);
-            if (response.data.success) {
-                setMyRequests(response.data.requests);
+        const fetchMyRequests = async () => {
+            try {
+                setLoadingRequests(true);
+                const response = await axios.get(`/holder/myRequests/${userAddress}`);
+                if (response.data.success) {
+                    setMyRequests(response.data.requests);
+                }
+            } catch (err) {
+                console.error("Error fetching requests:", err);
+            } finally {
+                setLoadingRequests(false);
             }
-        } catch (err) {
-            console.error("Error fetching requests:", err);
-        } finally {
-            setLoadingRequests(false);
+        };
+
+        if (userAddress) {
+            fetchMyRequests();
         }
-    };
+    }, [userAddress]);
 
     const handleDeleteRequest = async (requestId) => {
         if (!window.confirm("Are you sure you want to delete this request?")) {
@@ -38,7 +40,7 @@ export default function HolderMyRequests() {
         try {
             console.log("🗑️ Deleting request:", requestId);
 
-            const response = await axios.delete(`http://localhost:5000/holder/request/${requestId}`, {
+            const response = await axios.delete(`/holder/request/${requestId}`, {
                 data: { holderAddress: userAddress }
             });
 

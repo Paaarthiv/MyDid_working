@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import QRCode from "react-qr-code";
@@ -13,11 +13,7 @@ export default function ViewCredential() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchCredential();
-  }, [cid]);
-
-  const fetchCredential = async () => {
+  const fetchCredential = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -28,7 +24,7 @@ export default function ViewCredential() {
       // If not found, fetch from IPFS
       if (!credData || !credData.vc) {
         console.log("Fetching from IPFS...");
-        const response = await axios.get(`http://localhost:5000/fetchVC/${cid}`);
+        const response = await axios.get(`/fetchVC/${cid}`);
 
         if (response.data.success) {
           credData = {
@@ -69,7 +65,11 @@ export default function ViewCredential() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [cid]);
+
+  useEffect(() => {
+    fetchCredential();
+  }, [fetchCredential]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

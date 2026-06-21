@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
@@ -23,19 +23,13 @@ export default function IssuerCredentialView() {
     }
   }, [userRole, navigate]);
 
-  useEffect(() => {
-    if (cid) {
-      fetchCredential();
-    }
-  }, [cid]);
-
-  const fetchCredential = async () => {
+  const fetchCredential = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
       console.log("Fetching credential from IPFS:", cid);
-      const response = await axios.get(`http://localhost:5000/fetchVC/${cid}`);
+      const response = await axios.get(`/fetchVC/${cid}`);
 
       if (response.data.success) {
         setCredential({
@@ -53,7 +47,13 @@ export default function IssuerCredentialView() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [cid]);
+
+  useEffect(() => {
+    if (cid) {
+      fetchCredential();
+    }
+  }, [cid, fetchCredential]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

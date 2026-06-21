@@ -1,6 +1,17 @@
 // routes/authRoutes.js - Authentication routes
 const express = require("express");
 const { verifyMessage } = require("ethers");
+const { signToken, requireAuth } = require("../utils/auth");
+
+function roleFromMessage(message, explicitRole) {
+  if (["issuer", "holder", "verifier"].includes(explicitRole)) {
+    return explicitRole;
+  }
+  if (/issuer/i.test(message)) return "issuer";
+  if (/holder/i.test(message)) return "holder";
+  if (/verifier/i.test(message)) return "verifier";
+  return "user";
+}
 
 module.exports = (loggedInUsers) => {
   const router = express.Router();
@@ -9,7 +20,7 @@ module.exports = (loggedInUsers) => {
    * POST /login - MetaMask authentication
    */
   router.post("/login", async (req, res) => {
-    const { address, message, signature } = req.body;
+    const { address, message, signature, role } = req.body;
     
     if (!address || !message || !signature) {
       return res.status(400).json({ 
@@ -29,11 +40,23 @@ module.exports = (loggedInUsers) => {
       }
 
       // Store logged-in user
+      const userRole = roleFromMessage(message, role);
+      const did = `did:ethr:${address}`;
+      const signed = signToken({
+        sub: address.toLowerCase(),
+        address,
+        did,
+        publicKey: address,
+        role: userRole
+      });
+
       loggedInUsers[address] = {
         address: address,
         loginTime: new Date().toISOString(),
-        did: `did:ethr:${address}`,
-        publicKey: address
+        did,
+        publicKey: address,
+        role: userRole,
+        tokenExpiresAt: signed.expiresAt
       };
 
       console.log("✅ User logged in:", address);
@@ -42,10 +65,13 @@ module.exports = (loggedInUsers) => {
       res.json({ 
         success: true, 
         message: "Login successful",
+        token: signed.token,
+        expiresAt: signed.expiresAt,
         user: {
           address: address,
-          did: `did:ethr:${address}`,
-          publicKey: address
+          did,
+          publicKey: address,
+          role: userRole
         }
       });
     } catch (err) {
@@ -60,8 +86,8 @@ module.exports = (loggedInUsers) => {
   /**
    * POST /logout - Logout user
    */
-  router.post("/logout", (req, res) => {
-    const { address } = req.body;
+  router.post("/logout", requireAuth(), (req, res) => {
+    const address = req.user.address;
     
     if (loggedInUsers[address]) {
       delete loggedInUsers[address];
@@ -77,8 +103,15 @@ module.exports = (loggedInUsers) => {
   /**
    * GET /session - Check session status
    */
-  router.get("/session/:address", (req, res) => {
+  router.get("/session/:address", requireAuth(), (req, res) => {
     const { address } = req.params;
+
+    if (address.toLowerCase() !== req.user.address.toLowerCase()) {
+      return res.status(403).json({
+        success: false,
+        message: "Wallet address does not match authenticated user"
+      });
+    }
     
     if (loggedInUsers[address]) {
       res.json({

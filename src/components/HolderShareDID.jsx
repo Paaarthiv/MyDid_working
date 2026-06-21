@@ -19,7 +19,7 @@ export default function HolderShareDID() {
 
   const checkIfShared = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/getRegisteredHolders");
+      const response = await axios.get("/getRegisteredHolders");
       if (response.data.success) {
         const isRegistered = response.data.holders.some(
           h => h.holderAddress === userAddress
@@ -41,7 +41,7 @@ export default function HolderShareDID() {
       setIsSharing(true);
       setError(null);
 
-      const response = await axios.post("http://localhost:5000/registerHolderDID", {
+      const response = await axios.post("/registerHolderDID", {
         holderAddress: userAddress,
         holderDID: did,
         holderName: holderName.trim() || "Unknown Holder"

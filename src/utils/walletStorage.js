@@ -4,9 +4,6 @@
  * Does NOT affect blockchain, IPFS, or backend state
  */
 
-const STORAGE_VERSION = 1;
-const DB_NAME = 'WalletUIStorage';
-
 // Storage keys
 const KEYS = {
   VERIFIER_HISTORY: 'verifier_history',

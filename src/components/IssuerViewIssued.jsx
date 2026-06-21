@@ -34,7 +34,7 @@ export default function IssuerViewIssued() {
 
       // Fetch all requests from challenge system
       console.log("📋 Fetching all requests from challenge system...");
-      const response = await axios.get("http://localhost:5000/debug/requests");
+      const response = await axios.get("/debug/requests");
 
       console.log("📊 Response:", response.data);
       console.log("📊 Total requests:", response.data.requests?.length);
@@ -63,7 +63,7 @@ export default function IssuerViewIssued() {
             try {
               // Fetch VC from IPFS
               const vcResponse = await axios.get(
-                `http://localhost:5000/holder/vc/${req.issuedVCCID}`
+                `/holder/vc/${req.issuedVCCID}`
               );
 
               return {

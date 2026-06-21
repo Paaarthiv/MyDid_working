@@ -4,6 +4,9 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const https = require("https");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 // BBS+ library will be dynamically imported (ESM)
 let bbsLib = null;
 
@@ -18,11 +21,49 @@ const verifyRoutes = require("./routes/verifyRoutes");
 const holderRoutes = require("./routes/holderRoutes");
 const holderAdvancedRoutes = require("./routes/holderAdvancedRoutes");
 const didRoutes = require("./routes/didRoutes");
-const credentialRequestRoutes = require("./routes/credentialRequestRoutes");
 const challengeRoutes = require("./routes/challengeRoutes");
 
 const app = express();
-app.use(cors({ origin: "*" }));
+
+// Security middleware
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later."
+});
+app.use(limiter);
+
+// Restrict CORS while keeping local Vite/legacy CRA origins usable in development.
+const localFrontendOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:3001",
+  "http://127.0.0.1:3001"
+];
+const configuredFrontendOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
+const allowedOrigins = new Set([...localFrontendOrigins, ...configuredFrontendOrigins]);
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(null, false);
+  },
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+  optionsSuccessStatus: 204
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 // Increase payload limit to handle VCs with photos (base64 images can be large)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -128,8 +169,7 @@ async function initializeServices() {
   app.use("/holder", holderRoutes(loggedInUsers));
   app.use("/", holderAdvancedRoutes(loggedInUsers, bbsLib));
   app.use("/", didRoutes); // DID management routes
-  app.use("/", challengeRoutes); // Challenge-response DID verification routes (NEW - mount first)
-  app.use("/", credentialRequestRoutes); // Credential request routes (old - kept for compatibility)
+  app.use("/", challengeRoutes); // Challenge-response DID verification routes
 }
 
 
@@ -249,16 +289,37 @@ const PORT = process.env.PORT || 5000;
 
 initializeServices()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`\n${'='.repeat(60)}`);
-      console.log(`🚀 Digital Identity Management Server`);
-      console.log(`${'='.repeat(60)}`);
-      console.log(`📍 Server URL: http://localhost:${PORT}`);
-      console.log(`🔐 BBS+ Signatures: Enabled (BLS12-381)`);
-      console.log(`📦 IPFS: ${process.env.PINATA_API_KEY ? 'Configured' : 'Not Configured'}`);
-      console.log(`⛓️  Blockchain: ${isBlockchainReady() ? 'Connected (Sepolia)' : 'Not Configured'}`);
-      console.log(`${'='.repeat(60)}\n`);
-    });
+    // Check for HTTPS certificates
+    const sslOptions = {};
+    const useHttps = fs.existsSync("cert.pem") && fs.existsSync("key.pem");
+    
+    if (useHttps) {
+      sslOptions.cert = fs.readFileSync("cert.pem");
+      sslOptions.key = fs.readFileSync("key.pem");
+      
+      https.createServer(sslOptions, app).listen(PORT, () => {
+        console.log(`\n${'='.repeat(60)}`);
+        console.log(`🚀 Digital Identity Management Server (HTTPS)`);
+        console.log(`${'='.repeat(60)}`);
+        console.log(`📍 Server URL: https://localhost:${PORT}`);
+        console.log(`🔐 BBS+ Signatures: Enabled (BLS12-381)`);
+        console.log(`📦 IPFS: ${process.env.PINATA_API_KEY ? 'Configured' : 'Not Configured'}`);
+        console.log(`⛓️  Blockchain: ${isBlockchainReady() ? 'Connected (Sepolia)' : 'Not Configured'}`);
+        console.log(`${'='.repeat(60)}\n`);
+      });
+    } else {
+      app.listen(PORT, () => {
+        console.log(`\n${'='.repeat(60)}`);
+        console.log(`🚀 Digital Identity Management Server (HTTP)`);
+        console.log(`⚠️ WARNING: Running without HTTPS. For production, please provide cert.pem and key.pem`);
+        console.log(`${'='.repeat(60)}`);
+        console.log(`📍 Server URL: http://localhost:${PORT}`);
+        console.log(`🔐 BBS+ Signatures: Enabled (BLS12-381)`);
+        console.log(`📦 IPFS: ${process.env.PINATA_API_KEY ? 'Configured' : 'Not Configured'}`);
+        console.log(`⛓️  Blockchain: ${isBlockchainReady() ? 'Connected (Sepolia)' : 'Not Configured'}`);
+        console.log(`${'='.repeat(60)}\n`);
+      });
+    }
   })
   .catch((error) => {
     console.error("❌ Failed to start server:", error);

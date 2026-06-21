@@ -16,6 +16,16 @@ typechain-types/
 uploads/*
 !uploads/.gitkeep
 
+# Runtime data
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.json
+data/*.json.migrated
+
 # Keys
 bbs-keys.json
 bbs_keys.json

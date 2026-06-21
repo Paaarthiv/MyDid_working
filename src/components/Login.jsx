@@ -27,14 +27,15 @@ function Login({ onLogin }) {
             const message = "Login to DID App";
             const signature = await signer.signMessage(message);
 
-            const response = await axios.post("http://localhost:5000/login", {
+            const response = await axios.post("/login", {
               address,
               message,
               signature,
+              role: "user",
             });
 
             if (response.data.success) {
-              onLogin(address, did, publicKey);
+              onLogin(address, did, publicKey, response.data.token);
             }
           }
         } catch (err) {
@@ -63,15 +64,16 @@ function Login({ onLogin }) {
     const message = "Login to DID App";
     const signature = await signer.signMessage(message);
 
-    const response = await axios.post("http://localhost:5000/login", {
+    const response = await axios.post("/login", {
       address,
       message,
       signature,
+      role: "user",
     });
 
     if (response.data.success) {
       console.log("✅ Auto-login / manual login successful");
-      onLogin(address, did, publicKey);
+      onLogin(address, did, publicKey, response.data.token);
     }
   };
 

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import { Inbox, User, Calendar, FileText, CheckCircle, XCircle, Clock, AlertCircle, Send, Trash2, GraduationCap, Hash, MapPin, Award, BookOpen, Image, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { Inbox, User, Calendar, FileText, CheckCircle, XCircle, Clock, AlertCircle, Send, Trash2, GraduationCap, Hash, MapPin, Award, BookOpen, Image, Sparkles } from "lucide-react";
 import AnimatedPage from "./shared/AnimatedPage";
 
 export default function IssuerViewRequests() {
@@ -53,7 +53,7 @@ export default function IssuerViewRequests() {
       setLoading(true);
       setError(null);
       // Fetch all requests (not just verified - includes approved and rejected too)
-      const response = await axios.get("http://localhost:5000/issuer/allRequests");
+      const response = await axios.get("/issuer/allRequests");
 
       if (response.data.success) {
         setRequests(response.data.requests);
@@ -158,18 +158,46 @@ export default function IssuerViewRequests() {
 
       // Issue VC
       console.log('📝 Issuing VC to blockchain...');
-      const vcResponse = await axios.post("http://localhost:5000/issueVC", data, {
+      const vcResponse = await axios.post("/issueVC", data, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
       if (vcResponse.data.success) {
         const vcCID = vcResponse.data.ipfs?.vcCID;
+        const documentHash = vcResponse.data.documentHash;
         console.log('✅ VC issued with CID:', vcCID);
+
+        // Interact with MetaMask to anchor on blockchain
+        const contractAddress = import.meta.env.VITE_VC_CONTRACT_ADDRESS;
+        if (window.ethereum && contractAddress && documentHash && vcCID) {
+          try {
+            console.log('⛓️ Prompting MetaMask to anchor VC to blockchain...');
+            // Need to require/import ethers. Using window.ethers or dynamic import is best if we didn't import at top
+            const { ethers } = await import("ethers");
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            
+            const abi = [
+              "function storeVC(string memory documentHash, string memory ipfsCID) public returns (uint256)"
+            ];
+            const vcContract = new ethers.Contract(contractAddress, abi, signer);
+            
+            const tx = await vcContract.storeVC(documentHash, vcCID);
+            console.log(`⏳ Transaction submitted: ${tx.hash}`);
+            await tx.wait();
+            console.log(`✅ VC anchored to blockchain!`);
+          } catch (blockchainError) {
+            console.error("⚠️ Blockchain anchoring failed (continuing anyway):", blockchainError);
+            alert("Warning: Blockchain anchoring failed or was rejected. The VC was still issued off-chain.");
+          }
+        } else if (!contractAddress) {
+          console.warn("⚠️ VITE_VC_CONTRACT_ADDRESS not configured. Skipping on-chain anchor.");
+        }
 
         // Link VC to holder
         if (vcCID) {
           console.log('🔗 Linking VC to holder...');
-          await axios.post("http://localhost:5000/linkVCToHolder", {
+          await axios.post("/linkVCToHolder", {
             holderDID: selectedRequest.holderDID,
             vcCID: vcCID
           });
@@ -177,7 +205,7 @@ export default function IssuerViewRequests() {
 
         // Approve the request
         console.log('✅ Approving request:', requestId);
-        await axios.post("http://localhost:5000/issuer/approveRequest", {
+        await axios.post("/issuer/approveRequest", {
           requestId: requestId,
           vcCID: vcCID,
           issuerAddress: userAddress
@@ -223,7 +251,7 @@ export default function IssuerViewRequests() {
       setProcessingId(requestId);
 
       console.log('❌ Rejecting request:', requestId);
-      const response = await axios.post("http://localhost:5000/issuer/rejectRequest", {
+      const response = await axios.post("/issuer/rejectRequest", {
         requestId: requestId,
         rejectionReason: reason || "No reason provided",
         issuerAddress: userAddress
@@ -297,7 +325,7 @@ export default function IssuerViewRequests() {
       console.log("🗑️ Deleting request:", requestId);
 
       // Delete from backend
-      const response = await axios.delete(`http://localhost:5000/issuer/request/${requestId}`, {
+      const response = await axios.delete(`/issuer/request/${requestId}`, {
         data: { issuerAddress: userAddress }
       });
 

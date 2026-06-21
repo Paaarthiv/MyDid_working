@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const { ethers } = require('ethers');
+const { requireAuth, requireAddressMatch } = require('../utils/auth');
 const {
   createPendingRequest,
   createChallenge,
@@ -23,7 +24,7 @@ const {
  * Create a new credential request (status: pending)
  * Holder must then complete challenge-response to verify DID ownership
  */
-router.post('/holder/requestCredential', (req, res) => {
+router.post('/holder/requestCredential', requireAuth('holder'), requireAddressMatch(req => req.body.holderAddress), async (req, res) => {
   try {
     console.log('\n📥 Received credential request:');
     console.log('Request body:', req.body);
@@ -47,7 +48,7 @@ router.post('/holder/requestCredential', (req, res) => {
     }
 
     // Create pending request (not verified yet)
-    const requestId = createPendingRequest(
+    const requestId = await createPendingRequest(
       holderDID,
       holderAddress,
       holderName,
@@ -84,7 +85,7 @@ router.post('/holder/requestCredential', (req, res) => {
  * POST /challenge/request
  * Request a cryptographic challenge (nonce) for DID ownership proof
  */
-router.post('/challenge/request', (req, res) => {
+router.post('/challenge/request', requireAuth('holder'), async (req, res) => {
   try {
     console.log('\n🔐 Received challenge request:');
     console.log('Request body:', req.body);
@@ -103,7 +104,7 @@ router.post('/challenge/request', (req, res) => {
 
     // Validate request exists
     console.log('Looking up request:', requestId);
-    const request = getPendingRequest(requestId);
+    const request = await getPendingRequest(requestId);
     console.log('Found request:', request ? 'Yes' : 'No');
     
     if (!request) {
@@ -111,6 +112,13 @@ router.post('/challenge/request', (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Request not found'
+      });
+    }
+
+    if (request.holderAddress?.toLowerCase() !== req.user.address.toLowerCase()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Request does not belong to authenticated holder'
       });
     }
 
@@ -123,7 +131,7 @@ router.post('/challenge/request', (req, res) => {
     }
 
     // Create challenge
-    const challenge = createChallenge(requestId);
+    const challenge = await createChallenge(requestId);
 
     console.log(`🔐 Challenge created for request: ${requestId}`);
     console.log(`   Nonce ID: ${challenge.nonceId}`);
@@ -151,7 +159,7 @@ router.post('/challenge/request', (req, res) => {
  * POST /challenge/verify
  * Verify the challenge response (signature)
  */
-router.post('/challenge/verify', async (req, res) => {
+router.post('/challenge/verify', requireAuth('holder'), async (req, res) => {
   try {
     const { requestId, nonceId, signature } = req.body;
 
@@ -163,7 +171,7 @@ router.post('/challenge/verify', async (req, res) => {
     }
 
     // Get request and nonce data
-    const request = getPendingRequest(requestId);
+    const request = await getPendingRequest(requestId);
     if (!request) {
       return res.status(404).json({
         success: false,
@@ -171,25 +179,16 @@ router.post('/challenge/verify', async (req, res) => {
       });
     }
 
-    // Get nonce data from nonces utility
-    const nonceModule = require('../utils/nonces');
-    const nonces = require('../utils/nonces');
-    
-    // Access nonce data directly (we'll need to export this)
-    const fs = require('fs');
-    const path = require('path');
-    const NONCES_FILE = path.join(__dirname, '../data/nonces.json');
-    let nonceData = null;
-    
-    try {
-      const noncesData = JSON.parse(fs.readFileSync(NONCES_FILE, 'utf8'));
-      nonceData = noncesData[nonceId];
-    } catch (err) {
-      return res.status(404).json({
+    if (request.holderAddress?.toLowerCase() !== req.user.address.toLowerCase()) {
+      return res.status(403).json({
         success: false,
-        message: 'Nonce not found'
+        message: 'Request does not belong to authenticated holder'
       });
     }
+
+    // Get nonce data from nonces utility
+    const nonceModule = require('../utils/nonces');
+    const nonceData = await nonceModule.getNonceData(nonceId);
 
     if (!nonceData) {
       return res.status(404).json({
@@ -217,7 +216,7 @@ router.post('/challenge/verify', async (req, res) => {
 
     // Verify challenge
     try {
-      verifyChallenge(requestId, nonceId, signature, recoveredAddress);
+      await verifyChallenge(requestId, nonceId, signature, recoveredAddress);
 
       console.log(`✅ DID ownership verified for request: ${requestId}`);
       console.log(`   DID: ${request.holderDID}`);
@@ -255,9 +254,10 @@ router.post('/challenge/verify', async (req, res) => {
  * GET /issuer/verifiedRequests
  * Get all verified credential requests (ready for issuance)
  */
-router.get('/issuer/verifiedRequests', (req, res) => {
+router.get('/issuer/verifiedRequests', requireAuth('issuer'), async (req, res) => {
   try {
-    const verifiedRequests = getVerifiedRequests();
+    const verifiedRequests = await getVerifiedRequests();
+    const allPending = await getAllPendingRequests();
 
     console.log(`📋 Fetching verified requests: ${verifiedRequests.length} found`);
 
@@ -265,10 +265,10 @@ router.get('/issuer/verifiedRequests', (req, res) => {
       success: true,
       requests: verifiedRequests,
       count: verifiedRequests.length,
-      pendingCount: getAllPendingRequests().filter(r => r.status === 'pending').length,
+      pendingCount: allPending.filter(r => r.status === 'pending').length,
       verifiedCount: verifiedRequests.length,
-      approvedCount: getAllPendingRequests().filter(r => r.status === 'approved').length,
-      rejectedCount: getAllPendingRequests().filter(r => r.status === 'rejected').length
+      approvedCount: allPending.filter(r => r.status === 'approved').length,
+      rejectedCount: allPending.filter(r => r.status === 'rejected').length
     });
 
   } catch (error) {
@@ -285,9 +285,9 @@ router.get('/issuer/verifiedRequests', (req, res) => {
  * GET /issuer/allRequests
  * Get all credential requests (pending, verified, approved, rejected)
  */
-router.get('/issuer/allRequests', (req, res) => {
+router.get('/issuer/allRequests', requireAuth('issuer'), async (req, res) => {
   try {
-    const allRequests = getAllPendingRequests();
+    const allRequests = await getAllPendingRequests();
 
     console.log(`📋 Fetching all requests: ${allRequests.length} found`);
 
@@ -315,7 +315,7 @@ router.get('/issuer/allRequests', (req, res) => {
  * GET /holder/myRequests/:holderAddress
  * Get all requests for a specific holder
  */
-router.get('/holder/myRequests/:holderAddress', (req, res) => {
+router.get('/holder/myRequests/:holderAddress', requireAuth('holder'), requireAddressMatch(req => req.params.holderAddress), async (req, res) => {
   try {
     const { holderAddress } = req.params;
 
@@ -326,7 +326,7 @@ router.get('/holder/myRequests/:holderAddress', (req, res) => {
       });
     }
 
-    const requests = getRequestsByHolder(holderAddress);
+    const requests = await getRequestsByHolder(holderAddress);
 
     return res.json({
       success: true,
@@ -348,9 +348,10 @@ router.get('/holder/myRequests/:holderAddress', (req, res) => {
  * POST /issuer/approveRequest
  * Approve a verified request and mark it for VC issuance
  */
-router.post('/issuer/approveRequest', (req, res) => {
+router.post('/issuer/approveRequest', requireAuth('issuer'), async (req, res) => {
   try {
-    const { requestId, vcCID, issuerAddress } = req.body;
+    const { requestId, vcCID } = req.body;
+    const issuerAddress = req.user.address;
 
     console.log('\n📝 POST /issuer/approveRequest');
     console.log('Request body:', { requestId, vcCID, issuerAddress });
@@ -362,7 +363,7 @@ router.post('/issuer/approveRequest', (req, res) => {
       });
     }
 
-    const request = getPendingRequest(requestId);
+    const request = await getPendingRequest(requestId);
     
     if (!request) {
       return res.status(404).json({
@@ -386,7 +387,7 @@ router.post('/issuer/approveRequest', (req, res) => {
       approvedBy: issuerAddress
     });
     
-    const updatedRequest = updateRequestStatus(requestId, 'approved', {
+    const updatedRequest = await updateRequestStatus(requestId, 'approved', {
       issuedVCCID: vcCID,
       approvedBy: issuerAddress,
       approvedAt: new Date().toISOString()
@@ -417,9 +418,10 @@ router.post('/issuer/approveRequest', (req, res) => {
  * POST /issuer/rejectRequest
  * Reject a request
  */
-router.post('/issuer/rejectRequest', (req, res) => {
+router.post('/issuer/rejectRequest', requireAuth('issuer'), async (req, res) => {
   try {
-    const { requestId, rejectionReason, issuerAddress } = req.body;
+    const { requestId, rejectionReason } = req.body;
+    const issuerAddress = req.user.address;
 
     if (!requestId || !rejectionReason) {
       return res.status(400).json({
@@ -428,7 +430,7 @@ router.post('/issuer/rejectRequest', (req, res) => {
       });
     }
 
-    const request = getPendingRequest(requestId);
+    const request = await getPendingRequest(requestId);
     
     if (!request) {
       return res.status(404).json({
@@ -438,7 +440,7 @@ router.post('/issuer/rejectRequest', (req, res) => {
     }
 
     // Update request status
-    updateRequestStatus(requestId, 'rejected', {
+    await updateRequestStatus(requestId, 'rejected', {
       rejectionReason,
       rejectedBy: issuerAddress,
       rejectedAt: new Date().toISOString()
@@ -468,7 +470,7 @@ router.post('/issuer/rejectRequest', (req, res) => {
  * DELETE /holder/request/:requestId
  * Delete a credential request (Holder)
  */
-router.delete('/holder/request/:requestId', (req, res) => {
+router.delete('/holder/request/:requestId', requireAuth('holder'), requireAddressMatch(req => req.body.holderAddress), async (req, res) => {
   try {
     const { requestId } = req.params;
     const { holderAddress } = req.body;
@@ -484,7 +486,7 @@ router.delete('/holder/request/:requestId', (req, res) => {
     }
 
     // Delete the request
-    const result = deletePendingRequest(requestId);
+    const result = await deletePendingRequest(requestId);
 
     if (!result.success) {
       return res.status(404).json(result);
@@ -508,7 +510,7 @@ router.delete('/holder/request/:requestId', (req, res) => {
  * DELETE /issuer/request/:requestId
  * Delete a credential request (Issuer)
  */
-router.delete('/issuer/request/:requestId', (req, res) => {
+router.delete('/issuer/request/:requestId', requireAuth('issuer'), async (req, res) => {
   try {
     const { requestId } = req.params;
     const { issuerAddress } = req.body;
@@ -524,7 +526,7 @@ router.delete('/issuer/request/:requestId', (req, res) => {
     }
 
     // Delete the request
-    const result = deletePendingRequest(requestId);
+    const result = await deletePendingRequest(requestId);
 
     if (!result.success) {
       return res.status(404).json(result);
@@ -548,9 +550,9 @@ router.delete('/issuer/request/:requestId', (req, res) => {
  * GET /debug/requests
  * Debug endpoint to view all pending requests
  */
-router.get('/debug/requests', (req, res) => {
+router.get('/debug/requests', requireAuth('issuer'), async (req, res) => {
   try {
-    const allRequests = getAllPendingRequests();
+    const allRequests = await getAllPendingRequests();
     console.log('📋 Debug: All pending requests:', allRequests.length);
     
     return res.json({

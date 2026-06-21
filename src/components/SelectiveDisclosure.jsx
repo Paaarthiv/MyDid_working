@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getCredentialByCID } from "../utils/indexedDB";
@@ -16,11 +16,7 @@ export default function SelectiveDisclosure() {
   const [proofResult, setProofResult] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    fetchVC();
-  }, [cid]);
-
-  const fetchVC = async () => {
+  const fetchVC = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -31,7 +27,7 @@ export default function SelectiveDisclosure() {
       // If not in IndexedDB, fetch from IPFS
       if (!vcData || !vcData.vc) {
         console.log("Fetching VC from IPFS...");
-        const response = await axios.get(`http://localhost:5000/fetchVC/${cid}`);
+        const response = await axios.get(`/fetchVC/${cid}`);
 
         if (response.data.success) {
           vcData = {
@@ -64,7 +60,11 @@ export default function SelectiveDisclosure() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [cid]);
+
+  useEffect(() => {
+    fetchVC();
+  }, [fetchVC]);
 
   const isAcademicCertificate = vc?.type?.includes("AcademicCertificate");
 
@@ -140,7 +140,7 @@ export default function SelectiveDisclosure() {
         hasPublicKey: !!publicKey
       });
 
-      const response = await axios.post("http://localhost:5000/generateProof", {
+      const response = await axios.post("/generateProof", {
         vc: vc,
         selectedFields: selectedFields,
         publicKey: publicKey,

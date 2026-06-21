@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import QRCode from "react-qr-code";
@@ -10,13 +10,7 @@ export default function ViewVCDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (cid) {
-      fetchVC();
-    }
-  }, [cid]);
-
-  const fetchVC = async () => {
+  const fetchVC = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -24,7 +18,7 @@ export default function ViewVCDetail() {
       console.log("Fetching VC:", cid);
 
       const response = await axios.get(
-        `http://localhost:5000/holder/vc/${cid}`
+        `/holder/vc/${cid}`
       );
 
       if (response.data.success) {
@@ -39,7 +33,13 @@ export default function ViewVCDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [cid]);
+
+  useEffect(() => {
+    if (cid) {
+      fetchVC();
+    }
+  }, [cid, fetchVC]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";

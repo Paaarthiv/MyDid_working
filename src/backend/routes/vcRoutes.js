@@ -6,7 +6,8 @@ const crypto = require("crypto");
 
 const { computeFileHash, generateChallenge } = require("../utils/crypto");
 const { uploadFileToPinata, uploadJSONToPinata } = require("../utils/ipfs");
-const { storeVCOnChain, isBlockchainReady } = require("../utils/blockchain");
+const { requireAuth, requireAddressMatch } = require("../utils/auth");
+const { storeVCReference } = require("../utils/holderVcStore");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -34,7 +35,7 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
   /**
    * POST /issueVC - Issue Verifiable Credential with IPFS and blockchain anchoring
    */
-  router.post("/issueVC", upload.single("photo"), async (req, res) => {
+  router.post("/issueVC", requireAuth("issuer"), upload.single("photo"), requireAddressMatch(req => req.body.address), async (req, res) => {
     const { 
       name, address, holderDID, credentialType, holderAddress,
       // Student ID fields
@@ -42,14 +43,6 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
       // Academic Certificate fields
       registerNumber, degree, branch, university, location, cgpa, class: studentClass, examHeldIn, issueDate
     } = req.body;
-
-    // Verify user is logged in
-    if (!loggedInUsers[address]) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Unauthorized. Please login with MetaMask first." 
-      });
-    }
 
     // Validate required fields based on credential type
     const vcType = credentialType || "StudentID";
@@ -299,23 +292,11 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
       const vcUpload = await uploadJSONToPinata(vc, `VC-${vcType}-${identifier}-${Date.now()}`);
       vcCID = vcUpload.cid;
 
-      // Step 7: Store on blockchain
+      // Step 7: Blockchain anchoring is now done by the frontend
       let blockchainData = null;
-      if (isBlockchainReady()) {
-        try {
-          console.log("⛓️ Step 7: Anchoring to blockchain...");
-          blockchainData = await storeVCOnChain(documentHash, vcCID);
-          console.log("✅ VC anchored on blockchain");
-        } catch (blockchainError) {
-          console.error("⚠️ Blockchain anchoring failed (continuing anyway):", blockchainError.message);
-        }
-      } else {
-        console.warn("⚠️ Blockchain not configured - skipping on-chain anchoring");
-      }
 
       // Step 8: Store VC reference for holder (internal call)
       try {
-        const axios = require('axios');
         const holderWalletAddress = (() => {
           if (holderAddress) {
             return holderAddress;
@@ -354,8 +335,7 @@ module.exports = (loggedInUsers, bbsKeyPair, bbsLib) => {
                 documentHash: subject.documentHash
               };
 
-          await axios.post('http://localhost:5000/holder/store-vc', {
-            holderAddress: holderWalletAddress,
+          storeVCReference(holderWalletAddress, {
             vcCID: vcCID,
             issuerDID: issuerDID,
             issuanceDate: vc.issuanceDate,

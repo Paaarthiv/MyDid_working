@@ -3,6 +3,8 @@ const express = require("express");
 const { verifyVCOnChain, revokeVCOnChain, isBlockchainReady } = require("../utils/blockchain");
 const { retrieveJSONFromIPFS } = require("../utils/ipfs");
 const { computeStringHash } = require("../utils/crypto");
+const { requireAuth, requireAddressMatch } = require("../utils/auth");
+const { getDisclosedProofMessages, encodeMessages } = require("../utils/bbsMessages");
 
 module.exports = (loggedInUsers, bbsLib) => {
   const router = express.Router();
@@ -123,12 +125,42 @@ module.exports = (loggedInUsers, bbsLib) => {
           const proofType = actualVC.proof.type;
           
           if (proofType === "BbsBlsSignatureProof2020" && isPresentation) {
-            // This is a selective disclosure proof - mark as valid structure
             console.log("🔐 Selective disclosure proof detected");
-            bbsProofValid = true; // We trust the proof was generated correctly
-            verificationResult.details.bbsProofValid = true;
-            verificationResult.details.bbsNote = "Selective disclosure proof (derived from original VC)";
-            console.log("✅ Selective disclosure proof structure valid");
+            try {
+              if (!req.body.publicKey) {
+                throw new Error("publicKey is required to verify selective disclosure proofs");
+              }
+
+              const proofBytes = Uint8Array.from(Buffer.from(actualVC.proof.proofValue, "base64"));
+              const publicKeyBytes = Uint8Array.from(Buffer.from(req.body.publicKey, "base64"));
+              const disclosedFields = actualVC.proof.disclosedFields || [];
+              const { disclosedIndexes, disclosedMessages } = getDisclosedProofMessages(actualVC, disclosedFields);
+
+              if (disclosedIndexes.length !== disclosedFields.length) {
+                throw new Error("Presentation contains undisclosed or unsupported fields");
+              }
+
+              const verified = await bbsLib.verifyProof({
+                publicKey: publicKeyBytes,
+                header: new Uint8Array(),
+                presentationHeader: new Uint8Array(),
+                proof: proofBytes,
+                disclosedMessages: encodeMessages(disclosedMessages),
+                disclosedMessageIndexes: disclosedIndexes,
+                ciphersuite: bbsLib.CIPHERSUITES.BLS12381_SHA256
+              });
+
+              bbsProofValid = verified;
+              verificationResult.details.bbsProofValid = verified;
+              verificationResult.details.bbsNote = verified
+                ? "Selective disclosure proof cryptographically verified"
+                : "Selective disclosure proof failed cryptographic verification";
+            } catch (proofError) {
+              bbsProofValid = false;
+              verificationResult.details.bbsProofValid = false;
+              verificationResult.details.bbsError = proofError.message;
+              console.error("Selective disclosure proof verification failed:", proofError.message);
+            }
             
           } else if (proofType === "BbsBlsSignature2020" && bbsLib) {
             try {
@@ -289,10 +321,14 @@ module.exports = (loggedInUsers, bbsLib) => {
         verificationResult.details.blockchainError = "Blockchain not configured";
       }
 
+      const requiresBbsProof = actualVC?.proof?.type === "BbsBlsSignature2020" ||
+        actualVC?.proof?.type === "BbsBlsSignatureProof2020";
+
       // Determine overall verification status
       const isVerified = verificationResult.structureValid && 
                         verificationResult.ipfsValid && 
                         verificationResult.blockchainValid && 
+                        (!requiresBbsProof || bbsProofValid) &&
                         !verificationResult.revoked;
 
       console.log(`${isVerified ? '✅' : '❌'} Verification ${isVerified ? 'PASSED' : 'FAILED'}\n`);
@@ -361,7 +397,7 @@ module.exports = (loggedInUsers, bbsLib) => {
     } catch (err) {
       console.error("❌ Verification error:", err);
       console.error("❌ Error stack:", err.stack);
-      res.status(500).json({
+      res.status(err.statusCode || 500).json({
         success: false,
         message: err.message || "Verification failed",
         error: err.toString(),
@@ -374,16 +410,8 @@ module.exports = (loggedInUsers, bbsLib) => {
    * POST /revokeVC - Revoke a Verifiable Credential
    * Requires: logged-in issuer, documentHash
    */
-  router.post("/revokeVC", async (req, res) => {
+  router.post("/revokeVC", requireAuth("issuer"), requireAddressMatch(req => req.body.address), async (req, res) => {
     const { documentHash, address } = req.body;
-
-    // Verify user is logged in
-    if (!loggedInUsers[address]) {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Unauthorized. Please login with MetaMask first." 
-      });
-    }
 
     if (!documentHash) {
       return res.status(400).json({
@@ -451,7 +479,12 @@ module.exports = (loggedInUsers, bbsLib) => {
    * POST /createProof - Create selective disclosure proof from VC
    * Allows revealing only specific attributes while hiding others
    */
-  router.post("/createProof", async (req, res) => {
+  router.post("/legacy/createProof", async (req, res) => {
+    return res.status(410).json({
+      success: false,
+      message: "Legacy proof creation endpoint removed. Use POST /generateProof."
+    });
+
     const { vc, disclosedAttributes } = req.body;
 
     if (!vc || !vc.proof || !vc.proof.proofValue) {
@@ -565,7 +598,12 @@ module.exports = (loggedInUsers, bbsLib) => {
   /**
    * POST /verifyProof - Verify selective disclosure proof
    */
-  router.post("/verifyProof", async (req, res) => {
+  router.post("/legacy/verifyProof", async (req, res) => {
+    return res.status(410).json({
+      success: false,
+      message: "Legacy proof verification endpoint removed. Use POST /verifyProof."
+    });
+
     const { proof, publicKey, disclosedMessages, disclosedIndexes } = req.body;
 
     if (!proof || !publicKey || !disclosedMessages || !disclosedIndexes) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -8,7 +8,7 @@ import "../styles/animations.css";
 import AnimatedPage from "./shared/AnimatedPage";
 
 export default function HolderMyVCs() {
-  const { userAddress, did } = useAuth();
+  const { userAddress } = useAuth();
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,14 +18,7 @@ export default function HolderMyVCs() {
   const [cidInput, setCidInput] = useState("");
   const [addingVC, setAddingVC] = useState(false);
 
-  useEffect(() => {
-    if (userAddress) {
-      fetchCredentials();
-      fetchStats();
-    }
-  }, [userAddress]);
-
-  const fetchCredentials = async () => {
+  const fetchCredentials = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -39,7 +32,7 @@ export default function HolderMyVCs() {
       // Also fetch from backend
       try {
         const response = await axios.get(
-          `http://localhost:5000/holder/vcs/${userAddress}`
+          `/holder/vcs/${userAddress}`
         );
 
         if (response.data.success && response.data.vcs) {
@@ -80,9 +73,9 @@ export default function HolderMyVCs() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userAddress]);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     // Calculate stats from local credentials
     const localCreds = await getCredentials(userAddress);
     setStats({
@@ -93,7 +86,14 @@ export default function HolderMyVCs() {
         return (latest === null || credDate > latest) ? credDate : latest;
       }, null)?.toISOString() : null
     });
-  };
+  }, [userAddress]);
+
+  useEffect(() => {
+    if (userAddress) {
+      fetchCredentials();
+      fetchStats();
+    }
+  }, [userAddress, fetchCredentials, fetchStats]);
 
   const handleViewCredential = (cid) => {
     navigate(`/view-credential/${cid}`);
@@ -117,7 +117,7 @@ export default function HolderMyVCs() {
       console.log("Fetching VC from IPFS:", cidInput);
 
       // Fetch VC from IPFS
-      const response = await axios.get(`http://localhost:5000/fetchVC/${cidInput.trim()}`);
+      const response = await axios.get(`/fetchVC/${cidInput.trim()}`);
 
       if (!response.data.success) {
         throw new Error(response.data.message || "Failed to fetch VC");
@@ -164,7 +164,7 @@ export default function HolderMyVCs() {
 
       // Remove from backend first
       try {
-        const response = await axios.delete(`http://localhost:5000/holder/vc/${cid}`, {
+        const response = await axios.delete(`/holder/vc/${cid}`, {
           data: { address: userAddress }
         });
         console.log("✅ Backend removal successful:", response.data);

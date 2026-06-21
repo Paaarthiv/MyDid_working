@@ -21,7 +21,6 @@ import VerifierDashboard from "./components/VerifierDashboard";
 import VerifierDashboardNew from "./components/VerifierDashboardNew";
 import VerifierHistory from "./components/VerifierHistory";
 import VerifierProfile from "./components/VerifierProfile";
-import VCForm from "./components/Form";
 import ViewVC from "./components/VCView";
 import ViewVCDetail from "./components/ViewVCDetail";
 import ViewCredential from "./components/ViewCredential";
@@ -203,6 +202,7 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/verifier"
               element={

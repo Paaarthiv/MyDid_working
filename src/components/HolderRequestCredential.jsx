@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Send, FileText, User, MessageSquare, CheckCircle, AlertCircle, CreditCard, Hash, GraduationCap, BookOpen, Link2, Sparkles, Clock } from "lucide-react";
+import { Send, FileText, User, MessageSquare, CheckCircle, AlertCircle, CreditCard, Hash, GraduationCap, BookOpen, Link2, Clock } from "lucide-react";
 import AnimatedPage from "./shared/AnimatedPage";
 
 export default function HolderRequestCredential() {
@@ -13,7 +13,6 @@ export default function HolderRequestCredential() {
   const [credentialType, setCredentialType] = useState("Student ID");
   const [holderName, setHolderName] = useState("");
   const [verificationID, setVerificationID] = useState("");
-  const [studentIDDocument, setStudentIDDocument] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState(null);
@@ -27,11 +26,11 @@ export default function HolderRequestCredential() {
 
 
 
-  const fetchMyStudentIDVCs = async () => {
+  const fetchMyStudentIDVCs = useCallback(async () => {
     try {
       setLoadingVCs(true);
       console.log("📚 Fetching Student ID VCs for holder:", userAddress);
-      const response = await axios.get(`http://localhost:5000/holder/vcs/${userAddress}`);
+      const response = await axios.get(`/holder/vcs/${userAddress}`);
 
       if (response.data.success && response.data.vcs) {
         // Filter only Student ID VCs
@@ -63,14 +62,14 @@ export default function HolderRequestCredential() {
     } finally {
       setLoadingVCs(false);
     }
-  };
+  }, [userAddress]);
 
   // Fetch Student ID VCs when Academic Certificate is selected
   useEffect(() => {
     if (credentialType === "Academic Certificate" && userAddress) {
       fetchMyStudentIDVCs();
     }
-  }, [credentialType, userAddress]);
+  }, [credentialType, userAddress, fetchMyStudentIDVCs]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -133,7 +132,7 @@ export default function HolderRequestCredential() {
           console.log("🔗 Attaching Student ID VC:", selectedStudentVC);
         }
 
-        requestResponse = await axios.post("http://localhost:5000/holder/requestCredential", requestPayload);
+        requestResponse = await axios.post("/holder/requestCredential", requestPayload);
       } catch (step1Error) {
         console.error("❌ Step 1 failed:", step1Error);
         console.error("Response data:", step1Error.response?.data);
@@ -158,7 +157,7 @@ export default function HolderRequestCredential() {
 
       let challengeResponse;
       try {
-        challengeResponse = await axios.post("http://localhost:5000/challenge/request", {
+        challengeResponse = await axios.post("/challenge/request", {
           requestId
         });
       } catch (step2Error) {
@@ -205,7 +204,7 @@ export default function HolderRequestCredential() {
       console.log("🔍 Step 4: Verifying signature...");
       setError("Verifying your signature...");
 
-      const verifyResponse = await axios.post("http://localhost:5000/challenge/verify", {
+      const verifyResponse = await axios.post("/challenge/verify", {
         requestId,
         nonceId,
         signature
