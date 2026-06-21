@@ -1,3 +1,5 @@
+![Decentralized Identity Management System banner](assets/did-banner.png)
+
 # Decentralized Identity Management System
 
 A full-stack decentralized identity application for issuing, storing, presenting, and verifying verifiable credentials using Ethereum, IPFS, MetaMask, cryptographic hashing, BBS+ signatures, and selective disclosure.
