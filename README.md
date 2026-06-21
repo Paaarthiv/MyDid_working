@@ -1,101 +1,206 @@
-# Decentralized Identity Management App (DID App)
+# Decentralized Identity Management System
 
-## 🐳 Docker Usage (Recommended)
+A full-stack decentralized identity application for issuing, storing, presenting, and verifying verifiable credentials using Ethereum, IPFS, MetaMask, cryptographic hashing, BBS+ signatures, and selective disclosure.
 
-Quickly start the entire application (Frontend + Backend) with Docker.
+This project demonstrates a DID-based credential workflow where issuers create verifiable credentials, holders manage and selectively disclose credential claims, and verifiers validate credentials and presentations without relying on a centralized identity provider.
 
-### Prerequisites
-- Docker & Docker Compose installed
-- MetaMask Browser Extension
+## Features
 
-### Quick Start
-1. **Navigate to the project root**:
-   ```bash
-   cd "did app/mydid"
-   ```
-2. **Setup Environment**:
-   Ensure you have a `.env` file in `src/backend/` (see `src/backend/.env.example`).
-3. **Run with Docker Compose**:
-   ```bash
-   docker-compose up -d --build
-   ```
-4. **Access the App**:
-   - Frontend: [http://localhost:3000](http://localhost:3000)
-   - Backend: [http://localhost:5000](http://localhost:5000)
+- MetaMask wallet login for holder, issuer, and verifier roles
+- Server-issued authentication tokens for protected backend actions
+- DID and verifiable credential lifecycle flows
+- Ethereum smart contract anchoring for credential references
+- IPFS storage through Pinata HTTP APIs
+- BBS+ signature support for selective disclosure presentations
+- SHA-256 hashing for credential/document integrity checks
+- QR-based credential sharing and verification support
+- SQLite-backed request/challenge state for local development
+- Vite React frontend with Express/Node.js backend
 
-### 🔒 Security Note
-This Docker setup **does NOT** store or access your MetaMask private keys. All blockchain transaction signing happens strictly in your **browser** via the MetaMask extension. The backend only handles public data verification and IPFS storage.
+## Tech Stack
 
----
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, Vite, Tailwind CSS, Axios, ethers.js, MetaMask |
+| Backend | Node.js, Express, SQLite, Helmet, CORS, rate limiting |
+| Blockchain | Solidity, Hardhat, Ethereum/Sepolia, ethers.js |
+| Storage | IPFS via Pinata |
+| Cryptography | SHA-256, BBS+, BLS12-381-related credential proof concepts |
+| Identity | DID, Verifiable Credentials, selective disclosure |
 
-# Getting Started with Create React App
+## Architecture
 
+```mermaid
+flowchart LR
+  Holder["Holder + MetaMask"] --> Frontend["React/Vite Frontend"]
+  Issuer["Issuer + MetaMask"] --> Frontend
+  Verifier["Verifier + MetaMask"] --> Frontend
+  Frontend --> API["Express API"]
+  API --> Auth["Wallet Challenge + Auth Token"]
+  API --> DB["SQLite Request State"]
+  API --> IPFS["Pinata / IPFS"]
+  API --> Contract["Ethereum VCRegistry Contract"]
+  Contract --> Chain["Ethereum Network"]
+```
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Repository Structure
 
-## Available Scripts
+```text
+.
+|-- src/
+|   |-- components/          # React role dashboards and credential UI
+|   |-- context/             # Auth/theme context providers
+|   |-- utils/               # Frontend wallet and storage helpers
+|   `-- backend/
+|       |-- contracts/       # Solidity smart contracts
+|       |-- routes/          # Express API routes
+|       |-- scripts/         # Hardhat deployment scripts
+|       |-- utils/           # Auth, IPFS, blockchain, BBS+ helpers
+|       `-- server.js        # Backend entry point
+|-- public/                  # Static frontend assets
+|-- index.html               # Vite entry document
+|-- vite.config.mjs          # Vite configuration
+|-- docker-compose.yml       # Local container orchestration
+`-- package.json             # Frontend scripts and dependencies
+```
 
-In the project directory, you can run:
+## Prerequisites
 
-### `npm start`
+- Node.js 20 or newer
+- npm
+- MetaMask browser extension
+- Pinata account and API credentials
+- Ethereum RPC provider such as Infura or Alchemy
+- Testnet wallet for deployment and blockchain anchoring
+- Docker and Docker Compose, optional
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Environment Variables
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Create `src/backend/.env`:
 
-### `npm test`
+```env
+PORT=5000
+NODE_ENV=development
+AUTH_TOKEN_SECRET=replace_with_a_long_random_secret
+AUTH_TOKEN_TTL_SECONDS=28800
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+PINATA_JWT=your_pinata_jwt
+# Or use:
+# PINATA_API_KEY=your_pinata_api_key
+# PINATA_SECRET_API_KEY=your_pinata_secret_api_key
+IPFS_GATEWAY_URL=https://gateway.pinata.cloud/ipfs
 
-### `npm run build`
+INFURA_API_KEY=your_infura_key
+# Or:
+# ALCHEMY_API_KEY=your_alchemy_key
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+WALLET_PRIVATE_KEY=0x_your_testnet_only_private_key
+VC_CONTRACT_ADDRESS=0x_deployed_contract_address
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Never commit `.env`, private keys, Pinata credentials, JWT secrets, or generated runtime data.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Installation
 
-### `npm run eject`
+Install frontend dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+npm install
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Install backend dependencies:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cd src/backend
+npm install
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Running Locally
 
-## Learn More
+Start the backend:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+cd src/backend
+npm start
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Start the frontend in another terminal:
 
-### Code Splitting
+```bash
+npm run dev
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Default URLs:
 
-### Analyzing the Bundle Size
+- Frontend: `http://localhost:3000` or the Vite-assigned local URL
+- Backend: `http://localhost:5000`
+- Health check: `http://localhost:5000/health`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Smart Contract Workflow
 
-### Making a Progressive Web App
+Compile contracts:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+cd src/backend
+npm run compile
+```
 
-### Advanced Configuration
+Deploy to Sepolia:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+npm run deploy
+```
 
-### Deployment
+After deployment, copy the printed contract address into `VC_CONTRACT_ADDRESS`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Docker
 
-### `npm run build` fails to minify
+```bash
+docker-compose up -d --build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MetaMask signing still happens in the browser. The backend does not need, store, or request a user's MetaMask private key.
+
+## Validation
+
+Recommended checks before a release:
+
+```bash
+npm audit
+npm run build
+
+cd src/backend
+npm run compile
+npm audit --omit=dev
+```
+
+## Security Notes
+
+- Use a testnet-only wallet for contract deployment during development.
+- Rotate any credentials that were ever committed or shared.
+- Use HTTPS and strict CORS origins in production.
+- Set a strong `AUTH_TOKEN_SECRET` in production.
+- Keep runtime data, uploads, generated Hardhat artifacts, and build output out of Git.
+- Treat selective disclosure presentations as valid only after cryptographic proof verification.
+- Review remaining dev-only audit findings before production deployment.
+
+## Roadmap
+
+- Migrate Hardhat 2 tooling to Hardhat 3 or another maintained toolchain
+- Add automated backend route tests and frontend integration tests
+- Add CI for build, audit, contract compile, and lint checks
+- Add production deployment documentation
+- Add persistent production database support
+- Add formal threat model and key management documentation
+
+## Standards and References
+
+- W3C Decentralized Identifiers (DID)
+- W3C Verifiable Credentials Data Model
+- BBS+ selective disclosure signature concepts
+- Ethereum smart contracts and wallet-based signing
+- IPFS content-addressed storage
+
+## License
+
+This project is proposed to be licensed under the MIT License. See `LICENSE`.
