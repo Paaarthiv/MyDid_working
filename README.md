@@ -1,4 +1,4 @@
-![Decentralized Identity Management System banner](assets/did-banner.png)
+![Decentralized Identity Management System banner](assets/did-banner-v2.png)
 
 # Decentralized Identity Management System
 
